@@ -40,7 +40,7 @@ module Sashimi
         options.parse!(general)
 
         command = general.shift
-        if command =~ /^(install)$/
+        if command =~ /^(install|uninstall)$/
           command = Commands.const_get(command.capitalize).new(self)
           command.parse!(sub)
         else
@@ -82,6 +82,27 @@ module Sashimi
         options.parse!(args)
         args.each do |url|
           Plugin.new(url).install
+        end
+      end
+    end
+  
+    class Uninstall
+      def initialize(base_command)
+        @base_command = base_command        
+      end
+      
+      def options
+        OptionParser.new do |o|
+          o.set_summary_indent('  ')
+          o.banner =    "Usage: #{@base_command.script_name} uninstall PLUGIN"
+          o.define_head "Remove an installed plugin."
+        end
+      end
+      
+      def parse!(args)
+        options.parse!(args)
+        args.each do |name|
+          Plugin.new(name).uninstall
         end
       end
     end

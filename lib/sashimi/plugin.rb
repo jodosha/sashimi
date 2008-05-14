@@ -3,8 +3,9 @@ module Sashimi
     attr_accessor :url, :repository
     attr_reader :name
     
-    def initialize(url)
+    def initialize(url, name = nil)
       self.url = URI::parse(url).to_s
+      @name = name
       guess_name
       instantiate_repository
     end
@@ -12,6 +13,11 @@ module Sashimi
     # Install the plugin
     def install
       repository.install
+    end
+    
+    # Uninstall the plugin
+    def uninstall
+      repository.uninstall
     end
     
   private
@@ -25,6 +31,7 @@ module Sashimi
     
     # Try to guess the plugin name.
     def guess_name
+      return if @name #don't override @name if given
       @name = File.basename(self.url)
       if @name == 'trunk' || @name.empty?
         @name = File.basename(File.dirname(self.url))

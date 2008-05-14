@@ -7,6 +7,13 @@ module Sashimi
       @url, @plugin_name = url, plugin_name
     end
     
+    # Remove the repository
+    def uninstall
+      change_dir(local_repository_path)
+      raise plugin_name+" isn't in the local repository." unless File.exists?(plugin_name)
+      FileUtils.rm_rf(plugin_name)
+    end
+    
     class << self
       def local_repository_path # :nodoc:
         @local_repository_path ||= File.join(find_home, @@local_repository_sub_path) 
