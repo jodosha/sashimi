@@ -1,6 +1,7 @@
 module Sashimi
   class AbstractRepository
     @@local_repository_sub_path = File.join('.rails', 'plugins')
+    @@cache_file = '.plugins'
     attr_accessor :url, :plugin_name
     
     def initialize(url, plugin_name)
@@ -17,6 +18,10 @@ module Sashimi
     class << self
       def local_repository_path # :nodoc:
         @local_repository_path ||= File.join(find_home, @@local_repository_sub_path) 
+      end
+
+      def cache_file # :nodoc:
+        @@cache_file
       end
 
       # Find the user home directory
@@ -50,10 +55,29 @@ module Sashimi
       self.class.local_repository_path
     end
     
+    # Proxy for <tt>AbstractRepository#cache_file</tt>
+    def cache_file
+      self.class.cache_file
+    end
+    
     # Prepare the plugin installation
     def prepare_installation
       FileUtils.mkdir_p(local_repository_path)
       change_dir(local_repository_path)
+      FileUtils.touch(cache_file)
+    end
+    
+    # Add a plugin into the cache
+    def add_to_cache(plugin)
+      cache = YAML::load_file(cache_file) || {}
+      write_to_cache cache.to_hash.merge!(plugin)
+    end
+
+    # Write all the plugins into the cache
+    def write_to_cache(plugins)
+      FileUtils.mv(cache_file, "#{cache_file}-backup")
+      File.open(cache_file, 'w'){|f| f.write(plugins.to_yaml)}
+      FileUtils.rm("#{cache_file}-backup")
     end
   end
 end

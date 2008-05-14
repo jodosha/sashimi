@@ -18,18 +18,28 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   end
   
   def test_should_prepare_installation
-    repository.prepare_installation
-    assert File.exists?(repository.local_repository_path)
-    assert_equal(repository.local_repository_path, Dir.pwd)
-    remove_local_repository_path # make sure to cleanup tmp directories
+    initialize_repository_for_test do
+      assert File.exists?(repository.local_repository_path)
+      assert_equal(repository.local_repository_path, Dir.pwd)
+      assert File.exists?(repository.cache_file)
+    end
+  end
+  
+  def test_should_add_plugin_to_the_cache
+    initialize_repository_for_test do
+      expected = cache_content.merge(plugin)
+      repository.add_to_cache(plugin)
+      assert_equal expected, cache_content
+    end
   end
   
 private
-  def repository(url = 'git://github.com/jodosha/sashimi.git', plugin_name = 'sashimi')
-    @repository ||= AbstractRepository.new(url, plugin_name)
+  def cache_content
+    FileUtils.cd(repository.local_repository_path)
+    YAML::load_file(repository.cache_file).to_hash
   end
   
-  def remove_local_repository_path
-    FileUtils.rm_rf(File.join(repository.class.find_home, 'sashimi_test'))
+  def plugin
+    {'click-to-globalize' => {'type' => 'git'}}
   end
 end
