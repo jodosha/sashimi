@@ -24,7 +24,8 @@ module Sashimi
           o.separator ""
           o.separator "COMMANDS"
 
-          o.separator "  install        Install plugin(s) from known URL."
+          o.separator "  install        Install plugin from known URL."
+          o.separator "  uninstall      Uninstall plugin from local repository."
 
           o.separator ""
           o.separator "EXAMPLES"
@@ -32,6 +33,8 @@ module Sashimi
           o.separator "    #{@script_name} install http://dev.rubyonrails.com/svn/rails/plugins/continuous_builder\n"
           o.separator "  Install a plugin from a git URL:"
           o.separator "    #{@script_name} install git://github.com/jodosha/click-to-globalize.git\n"
+          o.separator "  Uninstall a plugin:"
+          o.separator "    #{@script_name} uninstall continuous_builder\n"
         end
       end
 
