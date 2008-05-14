@@ -33,6 +33,13 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     end
   end
   
+  def test_should_remove_plugin_from_cache
+    initialize_repository_for_test do
+      AbstractRepository.new('http://svn.com/plugin/trunk', 'plugin').remove_from_cache
+      assert_equal({}, cache_content)
+    end
+  end
+  
 private
   def cache_content
     FileUtils.cd(repository.local_repository_path)

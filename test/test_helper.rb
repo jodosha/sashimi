@@ -36,6 +36,6 @@ module Sashimi
   
   class AbstractRepository
     @@local_repository_sub_path = 'sashimi_test/.rails/plugins'
-    public :local_repository_path, :change_dir, :prepare_installation, :cache_file, :add_to_cache
+    public :local_repository_path, :change_dir, :prepare_installation, :cache_file, :add_to_cache, :remove_from_cache
   end
 end

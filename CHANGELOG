@@ -1,3 +1,5 @@
+* Remove a plugin from cache when uninstalled
+
 * Created a plugins cache to store the repository type (svn or git)
 
 * Improved shell commands help

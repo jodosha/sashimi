@@ -13,6 +13,7 @@ module Sashimi
       change_dir(local_repository_path)
       raise plugin_name+" isn't in the local repository." unless File.exists?(plugin_name)
       FileUtils.rm_rf(plugin_name)
+      remove_from_cache
     end
     
     class << self
@@ -71,6 +72,13 @@ module Sashimi
     def add_to_cache(plugin)
       cache = YAML::load_file(cache_file) || {}
       write_to_cache cache.to_hash.merge!(plugin)
+    end
+
+    # Remove a plugin from the cache
+    def remove_from_cache
+      cache = (YAML::load_file(cache_file) || {}).to_hash
+      cache.delete(plugin_name)
+      write_to_cache cache
     end
 
     # Write all the plugins into the cache
