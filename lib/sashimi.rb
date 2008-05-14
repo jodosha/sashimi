@@ -1,4 +1,4 @@
 require 'uri'
 require 'fileutils'
-require 'sashimi/plugin'
-require 'sashimi/repositories'
+require 'lib/sashimi/plugin'
+require 'lib/sashimi/repositories'

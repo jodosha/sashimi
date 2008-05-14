@@ -9,6 +9,11 @@ module Sashimi
       instantiate_repository
     end
     
+    # Install the plugin
+    def install
+      repository.install
+    end
+    
   private
     def instantiate_repository
       self.repository = if git_url?

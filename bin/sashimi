@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+require 'lib/sashimi'
+require 'lib/sashimi/commands'
+
+Sashimi::Commands::Command.parse!

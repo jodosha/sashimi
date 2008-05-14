@@ -1,3 +1,5 @@
+* Basic plugin install process
+
 * Introducing Plugin, AbstractRepository, SvnRepository and GitRepository
 
 * Adding Rakefile
