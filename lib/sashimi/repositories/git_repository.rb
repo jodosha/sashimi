@@ -3,7 +3,7 @@ module Sashimi
     def install
       prepare_installation
       system("git clone #{plugin.url}")
-      add_to_cache({plugin.guess_name => {'type' => 'git'}})
+      add_to_cache(plugin.to_hash)
     end
     
     def update

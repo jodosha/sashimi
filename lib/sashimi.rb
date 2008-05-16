@@ -1,5 +1,7 @@
 require 'uri'
 require 'yaml'
 require 'fileutils'
+require 'rubygems'
+require 'activesupport'
 require 'lib/sashimi/plugin'
 require 'lib/sashimi/repositories'

@@ -36,6 +36,11 @@ module Sashimi
       name
     end
     
+    # Serialize the plugin to Hash format.
+    def to_hash
+      {self.guess_name => {'type' => repository.scm_type}}
+    end
+    
     class << self
       # List all installed plugins.
       def list

@@ -3,7 +3,7 @@ module Sashimi
     def install
       prepare_installation
       system("svn co #{plugin.url} #{plugin.guess_name}")
-      add_to_cache({plugin.guess_name => {'type' => 'svn'}})
+      add_to_cache(plugin.to_hash)
     end
     
     def update

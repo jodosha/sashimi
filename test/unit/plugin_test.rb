@@ -28,4 +28,8 @@ class PluginTest < Test::Unit::TestCase
   def test_should_instantiate_svn_repository_for_not_git_url
     assert_kind_of SvnRepository, create_plugin(nil, 'http://dev.repository.com/svn/sashimi/trunk').repository
   end
+  
+  def test_should_serialize_to_hash
+    assert_equal({'sashimi' => {'type' => 'git'}}, plugin.to_hash)
+  end
 end

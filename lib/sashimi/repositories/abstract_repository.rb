@@ -15,7 +15,7 @@ module Sashimi
       FileUtils.rm_rf(plugin.name)
       remove_from_cache
     end
-    
+        
     class << self
       def instantiate_repository(plugin)
         unless plugin.name.nil?
@@ -87,6 +87,14 @@ module Sashimi
       def git_url?(url)
         url =~ /^git:\/\// || url =~ /\.git$/
       end
+    end
+
+    # Return the SCM type
+    #
+    #   Subversion   # => svn
+    #   Git          # => git
+    def scm_type
+      self.class.name.demodulize.gsub(/Repository$/, '').downcase
     end
     
   private
