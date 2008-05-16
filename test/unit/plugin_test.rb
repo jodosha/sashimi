@@ -30,6 +30,9 @@ class PluginTest < Test::Unit::TestCase
   end
   
   def test_should_serialize_to_hash
-    assert_equal({'sashimi' => {'type' => 'git'}}, plugin.to_hash)
+    initialize_repository_for_test do
+      expected = {'plugin' => {'type' => 'svn', 'summary' => 'Plugin summary'}}
+      assert_equal(expected, create_plugin('plugin', 'http://dev.repository.com/svn/plugin/trunk').to_hash)
+    end
   end
 end

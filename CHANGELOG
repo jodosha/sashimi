@@ -1,3 +1,5 @@
+* Cache summary stored in plugin about.yml [#5 state:resolved]
+
 * Plugin serialization [#4 state:resolved]
 
 * List all installed plugins [#3 state:resolved]

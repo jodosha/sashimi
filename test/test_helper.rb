@@ -12,6 +12,7 @@ private
   def initialize_repository_for_test(&block)
     repository.prepare_installation
     create_cache_file
+    create_plugins_directories
     yield
     remove_local_repository_path # make sure of clean up tmp dirs
   end
@@ -33,7 +34,15 @@ private
   end
 
   def cached_plugin
-    {'sashimi' => {'type' => 'git'}}
+    {'sashimi' => {'type' => 'git'}, 'plugin' => {'type' => 'svn'}}
+  end
+
+  def create_plugins_directories
+    AbstractRepository.change_dir_to_local_repository
+    FileUtils.mkdir('plugin') unless File.exists?('plugin')
+    FileUtils.cd('plugin')
+    File.open('about.yml', 'w+'){|f| f.write({'summary' => "Plugin summary"}.to_yaml)}
+    AbstractRepository.change_dir_to_local_repository
   end
 
   def create_cache_file
@@ -42,7 +51,7 @@ private
 
   def remove_local_repository_path
     FileUtils.rm_rf(File.join(repository.class.find_home, 'sashimi_test'))
-  end
+  end  
 end
 
 module Sashimi

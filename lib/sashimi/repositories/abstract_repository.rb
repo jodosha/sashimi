@@ -97,6 +97,14 @@ module Sashimi
       self.class.name.demodulize.gsub(/Repository$/, '').downcase
     end
     
+    # Read the content of the <tt>about.yml</tt>.
+    # New feature of Rails 2.1.x http:://dev.rubyonrails.org/changeset/9098
+    def about
+      change_dir_to_plugin_path
+      return {} unless File.exists?('about.yml')
+      (YAML::load_file('about.yml') || {}).to_hash
+    end
+    
   private
     # Proxy for <tt>AbstractRepository#change_dir</tt>
     def change_dir(dir)
@@ -110,7 +118,7 @@ module Sashimi
     
     # Change the current directory with the plugin one
     def change_dir_to_plugin_path
-      change_dir(File.join(local_repository_path, plugin.name))
+      change_dir(File.join(local_repository_path, plugin.name || plugin.guess_name))
     end
 
     # Proxy for <tt>AbstractRepository#local_repository_path</tt>
@@ -148,6 +156,7 @@ module Sashimi
 
     # Write all the plugins into the cache
     def write_to_cache(plugins)
+      change_dir_to_local_repository
       FileUtils.mv(cache_file, "#{cache_file}-backup")
       File.open(cache_file, 'w'){|f| f.write(plugins.to_yaml)}
       FileUtils.rm("#{cache_file}-backup")

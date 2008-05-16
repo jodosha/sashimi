@@ -36,7 +36,7 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   # COMMANDS
   def test_should_list_all_installed_plugins
     initialize_repository_for_test do
-      assert_equal(['sashimi'], AbstractRepository.list)
+      assert_equal(['plugin', 'sashimi'], AbstractRepository.list)
     end
   end
   
@@ -88,7 +88,7 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   def test_should_remove_plugin_from_cache
     initialize_repository_for_test do
       AbstractRepository.new(create_plugin('sashimi', '')).remove_from_cache
-      assert_equal({}, cache_content)
+      assert_equal({"plugin"=>{"type"=>"svn"}}, cache_content)
     end
   end
   

@@ -26,6 +26,17 @@ module Sashimi
       @repository ||= instantiate_repository
     end
     
+    # Read the content of the <tt>about.yml</tt>.
+    # New feature of Rails 2.1.x http:://dev.rubyonrails.org/changeset/9098
+    def about
+      repository.about
+    end
+    
+    # Return the plugin summary.
+    def summary
+      about['summary']
+    end
+    
     # Try to guess the plugin name.
     def guess_name
       name = File.basename(@url)
@@ -38,7 +49,9 @@ module Sashimi
     
     # Serialize the plugin to Hash format.
     def to_hash
-      {self.guess_name => {'type' => repository.scm_type}}
+      { self.guess_name => 
+        { 'type' => repository.scm_type,
+          'summary' => self.summary } }
     end
     
     class << self
