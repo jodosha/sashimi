@@ -1,13 +1,10 @@
 module Sashimi
   class Plugin
-    attr_accessor :url, :repository
-    attr_reader :name
+    attr_reader :url, :name
     
-    def initialize(url, name = nil)
-      self.url = URI::parse(url).to_s
+    def initialize(name, url = '')
+      @url = URI::parse(url).to_s
       @name = name
-      guess_name
-      instantiate_repository
     end
     
     # Install the plugin
@@ -19,29 +16,26 @@ module Sashimi
     def uninstall
       repository.uninstall
     end
-    
-  private
-    def instantiate_repository
-      self.repository = if git_url?
-        GitRepository
-      else
-        SvnRepository
-      end.new(self.url, self.name)
+            
+    def repository #:nodoc:
+      @repository ||= instantiate_repository
     end
     
     # Try to guess the plugin name.
     def guess_name
-      return if @name #don't override @name if given
-      @name = File.basename(self.url)
-      if @name == 'trunk' || @name.empty?
-        @name = File.basename(File.dirname(self.url))
+      name = File.basename(@url)
+      if name == 'trunk' || name.empty?
+        name = File.basename(File.dirname(@url))
       end
-      @name.gsub!(/\.git$/, '') if @name =~ /\.git$/
+      name.gsub!(/\.git$/, '') if name =~ /\.git$/
+      name
     end
     
-    # Try to guess if it's a Git repository.
-    def git_url?
-      self.url =~ /^git:\/\// || self.url =~ /\.git$/
-    end
+  private
+    # Instantiate the repository.
+    # Look at <tt>AbstractRepository#instantiate_repository</tt> documentation.
+    def instantiate_repository
+      AbstractRepository.instantiate_repository(self)
+    end      
   end
 end

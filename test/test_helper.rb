@@ -16,12 +16,28 @@ private
     remove_local_repository_path # make sure of clean up tmp dirs
   end
 
-  def repository(url = 'git://github.com/jodosha/sashimi.git', plugin_name = 'sashimi')
-    @repository ||= AbstractRepository.new(url, plugin_name)
+  def repository
+    create_repository
+  end
+
+  def create_repository(plugin_name = 'sashimi', url = 'git://github.com/jodosha/sashimi.git')
+    @repository ||= AbstractRepository.new(Plugin.new(plugin_name, url))
+  end
+
+  def plugin
+    create_plugin(nil, 'git://github.com/jodosha/sashimi.git')
+  end
+  
+  def create_plugin(name, url = nil)
+    Plugin.new(name, url)
+  end
+
+  def cached_plugin
+    {'sashimi' => {'type' => 'git'}}
   end
 
   def create_cache_file
-    File.open(repository.cache_file, 'w+'){|f| f.write({'plugin' => {'type' => 'svn'}}.to_yaml)}
+    File.open(repository.cache_file, 'w+'){|f| f.write(cached_plugin.to_yaml)}
   end
 
   def remove_local_repository_path
@@ -30,12 +46,11 @@ private
 end
 
 module Sashimi
-  class Plugin
-    public :git_url?
-  end
-  
   class AbstractRepository
     @@local_repository_sub_path = 'sashimi_test/.rails/plugins'
-    public :local_repository_path, :change_dir, :prepare_installation, :cache_file, :add_to_cache, :remove_from_cache
+    public :local_repository_path, :change_dir, :prepare_installation,
+      :cache_file, :add_to_cache, :remove_from_cache,
+      :cache_content, :change_dir_to_local_repository,
+      :change_dir_to_plugin_path
   end
 end

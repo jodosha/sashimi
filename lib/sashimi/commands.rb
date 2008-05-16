@@ -84,7 +84,7 @@ module Sashimi
       def parse!(args)
         options.parse!(args)
         args.each do |url|
-          Plugin.new(url).install
+          Plugin.new(nil, url).install
         end
       end
     end
