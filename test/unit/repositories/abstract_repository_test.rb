@@ -36,7 +36,7 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   # COMMANDS
   def test_should_list_all_installed_plugins
     initialize_repository_for_test do
-      assert_equal(['plug-in', 'plugin', 'sashimi'], AbstractRepository.list)
+      assert_equal("plug-in\t\t\nplugin\t\t\nsashimi\t\t", AbstractRepository.list)
     end
   end
   

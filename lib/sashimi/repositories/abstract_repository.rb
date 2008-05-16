@@ -27,7 +27,9 @@ module Sashimi
 
       # Return all installed plugin names
       def list
-        cache_content.keys.sort
+        cache_content.sort.collect do |plugin, contents|
+          "#{plugin}\t\t#{contents['summary']}"
+        end.join("\n")
       end
 
       def local_repository_path #:nodoc:

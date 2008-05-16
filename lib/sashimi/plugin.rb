@@ -29,7 +29,7 @@ module Sashimi
     # Read the content of the <tt>about.yml</tt>.
     # New feature of Rails 2.1.x http:://dev.rubyonrails.org/changeset/9098
     def about
-      repository.about
+      @about ||= repository.about
     end
     
     # Return the plugin summary.
