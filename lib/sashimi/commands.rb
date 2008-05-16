@@ -26,6 +26,7 @@ module Sashimi
 
           o.separator "  install        Install plugin from known URL."
           o.separator "  uninstall      Uninstall plugin from local repository."
+          o.separator "  update         Update installed plugin(s)."
 
           o.separator ""
           o.separator "EXAMPLES"
@@ -35,6 +36,8 @@ module Sashimi
           o.separator "    #{@script_name} install git://github.com/jodosha/click-to-globalize.git\n"
           o.separator "  Uninstall a plugin:"
           o.separator "    #{@script_name} uninstall continuous_builder\n"
+          o.separator "  Update a plugin:"
+          o.separator "    #{@script_name} update click-to-globalize\n"
         end
       end
 
@@ -43,7 +46,7 @@ module Sashimi
         options.parse!(general)
 
         command = general.shift
-        if command =~ /^(install|uninstall)$/
+        if command =~ /^(install|uninstall|update)$/
           command = Commands.const_get(command.capitalize).new(self)
           command.parse!(sub)
         else
@@ -106,6 +109,27 @@ module Sashimi
         options.parse!(args)
         args.each do |name|
           Plugin.new(name).uninstall
+        end
+      end
+    end
+    
+    class Update
+      def initialize(base_command)
+        @base_command = base_command        
+      end
+      
+      def options
+        OptionParser.new do |o|
+          o.set_summary_indent('  ')
+          o.banner =    "Usage: #{@base_command.script_name} update PLUGIN"
+          o.define_head "Update an installed plugin."
+        end
+      end
+      
+      def parse!(args)
+        options.parse!(args)
+        args.each do |name|
+          Plugin.new(name).update
         end
       end
     end

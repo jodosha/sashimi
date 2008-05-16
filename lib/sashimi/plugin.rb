@@ -16,7 +16,12 @@ module Sashimi
     def uninstall
       repository.uninstall
     end
-            
+    
+    # Update the plugin
+    def update
+      repository.update
+    end
+        
     def repository #:nodoc:
       @repository ||= instantiate_repository
     end

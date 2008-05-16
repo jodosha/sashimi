@@ -1,3 +1,5 @@
+* Update an installed plugin [#1 state:resolved]
+
 * Refactored Plugin and AbstractRepository to separate class responsabilities
 
 * Remove a plugin from cache when uninstalled
