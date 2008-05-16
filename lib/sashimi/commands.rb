@@ -26,7 +26,8 @@ module Sashimi
 
           o.separator "  install        Install plugin from known URL."
           o.separator "  uninstall      Uninstall plugin from local repository."
-          o.separator "  update         Update installed plugin(s)."
+          o.separator "  update         Update an installed plugin."
+          o.separator "  list           List all installed plugins."
 
           o.separator ""
           o.separator "EXAMPLES"
@@ -38,6 +39,8 @@ module Sashimi
           o.separator "    #{@script_name} uninstall continuous_builder\n"
           o.separator "  Update a plugin:"
           o.separator "    #{@script_name} update click-to-globalize\n"
+          o.separator "  List all installed plugins:"
+          o.separator "    #{@script_name} list\n"
         end
       end
 
@@ -46,7 +49,7 @@ module Sashimi
         options.parse!(general)
 
         command = general.shift
-        if command =~ /^(install|uninstall|update)$/
+        if command =~ /^(install|uninstall|update|list)$/
           command = Commands.const_get(command.capitalize).new(self)
           command.parse!(sub)
         else
@@ -131,6 +134,46 @@ module Sashimi
         args.each do |name|
           Plugin.new(name).update
         end
+      end
+    end
+
+    class Uninstall
+      def initialize(base_command)
+        @base_command = base_command        
+      end
+      
+      def options
+        OptionParser.new do |o|
+          o.set_summary_indent('  ')
+          o.banner =    "Usage: #{@base_command.script_name} uninstall PLUGIN"
+          o.define_head "Remove an installed plugin."
+        end
+      end
+      
+      def parse!(args)
+        options.parse!(args)
+        args.each do |name|
+          Plugin.new(name).uninstall
+        end
+      end
+    end
+    
+    class List
+      def initialize(base_command)
+        @base_command = base_command        
+      end
+      
+      def options
+        OptionParser.new do |o|
+          o.set_summary_indent('  ')
+          o.banner =    "Usage: #{@base_command.script_name} list"
+          o.define_head "List all installed plugins."
+        end
+      end
+      
+      def parse!(args)
+        options.parse!(args)
+        puts Plugin.list
       end
     end
   end

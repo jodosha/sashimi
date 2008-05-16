@@ -24,7 +24,12 @@ module Sashimi
           instantiate_repository_by_url(plugin)
         end.new(plugin)
       end
-            
+
+      # Return all installed plugin names
+      def list
+        cache_content.keys.sort
+      end
+
       def local_repository_path #:nodoc:
         @local_repository_path ||= File.join(find_home, @@local_repository_sub_path) 
       end

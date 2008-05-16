@@ -33,6 +33,13 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     assert AbstractRepository.git_url?('git://github.com/jodosha/sashimi.git')
   end
   
+  # COMMANDS
+  def test_should_list_all_installed_plugins
+    initialize_repository_for_test do
+      assert_equal(['sashimi'], AbstractRepository.list)
+    end
+  end
+  
   # DIRECTORIES
   def test_should_change_current_dir
     repository.change_dir(repository.class.find_home)

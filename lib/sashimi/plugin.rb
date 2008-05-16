@@ -36,6 +36,13 @@ module Sashimi
       name
     end
     
+    class << self
+      # List all installed plugins.
+      def list
+        AbstractRepository.list
+      end
+    end
+        
   private
     # Instantiate the repository.
     # Look at <tt>AbstractRepository#instantiate_repository</tt> documentation.
