@@ -12,7 +12,7 @@ private
   def initialize_repository_for_test(&block)
     repository.prepare_installation
     create_cache_file
-    create_plugins_directories
+    create_plugin_directories
     yield
     remove_local_repository_path # make sure of clean up tmp dirs
   end
@@ -34,14 +34,22 @@ private
   end
 
   def cached_plugin
-    {'sashimi' => {'type' => 'git'}, 'plugin' => {'type' => 'svn'}}
+    { 'sashimi' => {'type' => 'git'}, 
+      'plugin'  => {'type' => 'svn'},
+      'plug-in' => {'type' => 'svn'} }
   end
 
-  def create_plugins_directories
+  def create_plugin_directories
+    { 'plugin' => true, 'plug-in' => false }.each do |plugin, about|
+      create_plugin_directory(plugin, about)
+    end
+  end
+
+  def create_plugin_directory(plugin, about = true)
     AbstractRepository.change_dir_to_local_repository
-    FileUtils.mkdir('plugin') unless File.exists?('plugin')
-    FileUtils.cd('plugin')
-    File.open('about.yml', 'w+'){|f| f.write({'summary' => "Plugin summary"}.to_yaml)}
+    FileUtils.mkdir(plugin) unless File.exists?(plugin)
+    FileUtils.cd(plugin)
+    File.open('about.yml', 'w+'){|f| f.write({'summary' => "Plugin summary"}.to_yaml)} if about
     AbstractRepository.change_dir_to_local_repository
   end
 

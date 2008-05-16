@@ -36,7 +36,7 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   # COMMANDS
   def test_should_list_all_installed_plugins
     initialize_repository_for_test do
-      assert_equal(['plugin', 'sashimi'], AbstractRepository.list)
+      assert_equal(['plug-in', 'plugin', 'sashimi'], AbstractRepository.list)
     end
   end
   
@@ -88,7 +88,23 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   def test_should_remove_plugin_from_cache
     initialize_repository_for_test do
       AbstractRepository.new(create_plugin('sashimi', '')).remove_from_cache
-      assert_equal({"plugin"=>{"type"=>"svn"}}, cache_content)
+      assert_equal({"plugin"=>{"type"=>"svn"}, "plug-in"=>{"type"=>"svn"}}, cache_content)
+    end
+  end
+  
+  # ABOUT
+  def test_should_return_about_contents_from_about_yml
+    initialize_repository_for_test do
+      plugin = create_plugin('plugin', 'http://dev.repository.com/svn/plugin/trunk')
+      assert_equal({'summary' => "Plugin summary"}, plugin.about)
+    end
+  end
+  
+  def test_should_return_empty_hash_for_unexstistent_about_yml
+    initialize_repository_for_test do
+      
+      plugin = create_plugin('plug-in', 'http://dev.repository.com/svn/plug-in/trunk')
+      assert_equal({}, plugin.about)
     end
   end
   

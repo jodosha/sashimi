@@ -1,3 +1,5 @@
+* Improved tests for Plugin#about
+
 * Cache summary stored in plugin about.yml [#5 state:resolved]
 
 * Plugin serialization [#4 state:resolved]
