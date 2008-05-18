@@ -1,3 +1,5 @@
+* Added version.rb
+
 * Added installation instructions, examples and copyright to README [#9 state:resolved]
 
 * Created gemspec file [#8 state:resolved]
