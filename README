@@ -1,1 +1,73 @@
 Sashimi
+=======
+
+Sashimi is a Rails plugins manager.
+It allows to install your favourite plugins in a local repository and add them to your Rails apps.
+The main goal is to allow the plugins offline installation.
+
+
+
+Installation
+============
+
+$ (sudo) gem install jodosha-sashimi --source=http://gems.github.com
+
+
+
+Usage
+=====
+
+Install a plugin from a subversion URL:
+$ sashimi install http://dev.rubyonrails.com/svn/rails/plugins/continuous_builder
+
+Install a plugin from a git URL:
+$ sashimi install git://github.com/jodosha/click-to-globalize.git
+
+Uninstall a plugin:
+$ sashimi uninstall continuous_builder
+
+Update a plugin:
+$ sashimi update click-to-globalize
+
+List all installed plugins:
+$ sashimi list
+
+Add installed plugin(s) to a Rails app:
+$ sashimi add click-to-globalize
+
+
+
+Known And Common Issues
+=======================
+
+* When add a plugin to an app, make sure your current directory is the rails root.
+
+* Only Subversion and Git repositories are currently supported.
+
+
+Contribute
+==========
+
+* Check out the code and test it:
+  $ git clone git://github.com/jodosha/sashimi.git
+  $ rake
+
+* Create a ticket to: http://sushistar.lighthouseapp.com
+
+* Create a patch and add as attachement to the ticket.
+
+
+Credits
+=======
+
+Partially inspired to RaPT[http://rapt.rubyforge.org/].
+
+
+
+Home Page
+=========
+http://lucaguidi.com/pages/sashimi
+
+
+
+Copyright (c) 2008 Luca Guidi - http://lucaguidi.com, released under the MIT license
