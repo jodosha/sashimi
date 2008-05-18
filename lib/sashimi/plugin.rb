@@ -21,7 +21,12 @@ module Sashimi
     def update
       repository.update
     end
-        
+
+    # Add to a Rails app
+    def add
+      repository.add
+    end
+
     def repository #:nodoc:
       @repository ||= instantiate_repository
     end

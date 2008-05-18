@@ -68,6 +68,6 @@ module Sashimi
     public :local_repository_path, :change_dir, :prepare_installation,
       :cache_file, :add_to_cache, :remove_from_cache,
       :cache_content, :change_dir_to_local_repository,
-      :change_dir_to_plugin_path
+      :change_dir_to_plugin_path, :plugins_dir, :copy_plugin_to_rails_app
   end
 end

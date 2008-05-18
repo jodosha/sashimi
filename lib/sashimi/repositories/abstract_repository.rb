@@ -15,7 +15,14 @@ module Sashimi
       FileUtils.rm_rf(plugin.name)
       remove_from_cache
     end
-        
+    
+    # Add to a Rails app.
+    def add
+      copy_plugin_to_rails_app
+      remove_hidden_folders
+      run_install_hook
+    end
+       
     class << self
       def instantiate_repository(plugin)
         unless plugin.name.nil?
@@ -64,6 +71,11 @@ module Sashimi
       # Change the current directory with local_repository_path
       def change_dir_to_local_repository
         change_dir(local_repository_path)
+      end
+      
+      # Rails app plugins dir
+      def plugins_dir
+        @@plugins_dir ||= File.join('vendor', 'plugins')
       end
       
       # Find the user home directory
@@ -138,6 +150,11 @@ module Sashimi
       self.class.cache_content
     end
     
+    # Proxy for <tt>AbstractRepository#plugins_dir</tt>
+    def plugins_dir
+      self.class.plugins_dir
+    end
+    
     # Prepare the plugin installation
     def prepare_installation
       FileUtils.mkdir_p(local_repository_path)
@@ -162,6 +179,24 @@ module Sashimi
       FileUtils.mv(cache_file, "#{cache_file}-backup")
       File.open(cache_file, 'w'){|f| f.write(plugins.to_yaml)}
       FileUtils.rm("#{cache_file}-backup")
+    end
+    
+    # Copy a plugin to a Rails app.
+    def copy_plugin_to_rails_app
+      FileUtils.mkdir_p(plugins_dir)
+      FileUtils.cp_r(File.join(local_repository_path, plugin.name), File.join(plugins_dir, plugin.name))
+    end
+    
+    # Remove SCM hidden folders.
+    # TODO: make working on Windows platform.
+    def remove_hidden_folders
+      system(%(find vendor/plugins/#{plugin.name} -name ".#{scm_type}" -type d -print | xargs rm -rf {}))
+    end
+    
+    # Run the plugin install hook.
+    def run_install_hook
+      install_hook_file = File.join(plugins_dir, plugin.name, 'install.rb')
+      load install_hook_file if File.exist? install_hook_file
     end
   end
 end

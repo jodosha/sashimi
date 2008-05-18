@@ -17,6 +17,10 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     assert_equal(".plugins", repository.cache_file)
   end
 
+  def test_plugins_dir
+    assert_equal('vendor/plugins', repository.plugins_dir)
+  end
+
   # INSTANTIATE
   def test_should_instantiate_repository_by_url
     assert_kind_of(SvnRepository, AbstractRepository.instantiate_repository(create_plugin(nil, 'http://svn.com')))
@@ -58,6 +62,14 @@ class AbstractRepositoryTest < Test::Unit::TestCase
       FileUtils.mkdir_p(cached_plugin_path)
       repository.change_dir_to_plugin_path
       assert_equal(cached_plugin_path, Dir.pwd)
+    end
+  end
+  
+  def _ignore_test_should_copy_plugin_to_a_rails_app
+    initialize_repository_for_test do
+      repository.change_dir_to_local_repository
+      create_repository('plugin', '').copy_plugin_to_rails_app
+      assert File.exists?(File.join('vendor', 'plugins', 'plugin', 'about.yml'))
     end
   end
   

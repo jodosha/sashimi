@@ -1,3 +1,5 @@
+* Add an installed plugin to a Rails app [#7 state:resolved]
+
 * Show plugin summary in list command [#6 state:resolved]
 
 * Improved tests for Plugin#about

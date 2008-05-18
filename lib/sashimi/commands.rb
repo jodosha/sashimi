@@ -28,6 +28,7 @@ module Sashimi
           o.separator "  uninstall      Uninstall plugin from local repository."
           o.separator "  update         Update an installed plugin."
           o.separator "  list           List all installed plugins."
+          o.separator "  add            Add installed plugin(s) to a Rails app."
 
           o.separator ""
           o.separator "EXAMPLES"
@@ -41,6 +42,8 @@ module Sashimi
           o.separator "    #{@script_name} update click-to-globalize\n"
           o.separator "  List all installed plugins:"
           o.separator "    #{@script_name} list\n"
+          o.separator "  Add installed plugin(s) to a Rails app:"
+          o.separator "    #{@script_name} add click-to-globalize\n"
         end
       end
 
@@ -49,7 +52,7 @@ module Sashimi
         options.parse!(general)
 
         command = general.shift
-        if command =~ /^(install|uninstall|update|list)$/
+        if command =~ /^(install|uninstall|update|list|add)$/
           command = Commands.const_get(command.capitalize).new(self)
           command.parse!(sub)
         else
@@ -174,6 +177,27 @@ module Sashimi
       def parse!(args)
         options.parse!(args)
         puts Plugin.list
+      end
+    end
+
+    class Add
+      def initialize(base_command)
+        @base_command = base_command        
+      end
+      
+      def options
+        OptionParser.new do |o|
+          o.set_summary_indent('  ')
+          o.banner =    "Usage: #{@base_command.script_name} add PLUGIN"
+          o.define_head "Add installed plugin(s) to a Rails app."
+        end
+      end
+      
+      def parse!(args)
+        options.parse!(args)
+        args.each do |name|
+          Plugin.new(name).add
+        end
       end
     end
   end
