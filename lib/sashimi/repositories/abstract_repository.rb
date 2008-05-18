@@ -1,4 +1,15 @@
 module Sashimi
+  class PluginNotFound < StandardError #:nodoc:
+    def initialize(plugin_name, message = nil)
+      @plugin_name = plugin_name
+      @message     = message
+    end
+
+    def to_s
+      @message || @plugin_name + " isn't in the local repository."
+    end
+  end
+  
   class AbstractRepository
     @@local_repository_sub_path = File.join('.rails', 'plugins')
     @@cache_file = '.plugins'
@@ -11,7 +22,7 @@ module Sashimi
     # Remove the repository
     def uninstall
       change_dir_to_local_repository
-      raise plugin.name+" isn't in the local repository." unless File.exists?(plugin.name)
+      raise PluginNotFound.new(plugin.name) unless File.exists?(plugin.name)
       FileUtils.rm_rf(plugin.name)
       remove_from_cache
     end
@@ -59,7 +70,7 @@ module Sashimi
 
       def instantiate_repository_by_cache(plugin)
         cached_plugin = cache_content[plugin.name]
-        raise plugin.name + " isn't in the local repository." if cached_plugin.nil?
+        raise PluginNotFound.new(plugin.name) if cached_plugin.nil?
         cached_plugin['type'] == 'git' ? GitRepository : SvnRepository
       end
 
