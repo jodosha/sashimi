@@ -1,3 +1,5 @@
+* Fixed sashimi.gemspec: sashimi executable is now available after gem setup
+
 * Made AbstractRepository#remove_hidden_folders platform independent
 
 * Fixed loading in sashimi
