@@ -1,3 +1,5 @@
+* Fixed lib loading in sashimi.rb
+
 * Added setup.rb
 
 * Added PluginNotFound to improve OOP in exceptions handling
