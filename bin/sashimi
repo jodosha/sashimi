@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-require 'lib/sashimi'
-require 'lib/sashimi/commands'
+$LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
+require 'sashimi'
+require 'sashimi/commands'
 
 Sashimi::Commands::Command.parse!

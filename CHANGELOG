@@ -1,3 +1,5 @@
+* Fixed loading in sashimi
+
 * Fixed lib loading in sashimi.rb
 
 * Added setup.rb
