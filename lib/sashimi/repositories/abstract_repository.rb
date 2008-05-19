@@ -29,6 +29,7 @@ module Sashimi
     
     # Add to a Rails app.
     def add
+      puts plugin.name.titleize + "\n"
       copy_plugin_to_rails_app
       remove_hidden_folders
       run_install_hook
