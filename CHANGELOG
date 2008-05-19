@@ -1,3 +1,5 @@
+* Fixed shell help output in commands.rb: make clear each command accepts multiple params. Deleted duplicated Update class from commands.rb.
+
 * Fixed sashimi.gemspec: sashimi executable is now available after gem setup
 
 * Made AbstractRepository#remove_hidden_folders platform independent

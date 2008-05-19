@@ -24,9 +24,9 @@ module Sashimi
           o.separator ""
           o.separator "COMMANDS"
 
-          o.separator "  install        Install plugin from known URL."
-          o.separator "  uninstall      Uninstall plugin from local repository."
-          o.separator "  update         Update an installed plugin."
+          o.separator "  install        Install plugin(s) from known URL(s)."
+          o.separator "  uninstall      Uninstall plugin(s) from local repository."
+          o.separator "  update         Update installed plugin(s)."
           o.separator "  list           List all installed plugins."
           o.separator "  add            Add installed plugin(s) to a Rails app."
 
@@ -85,8 +85,8 @@ module Sashimi
       def options
         OptionParser.new do |o|
           o.set_summary_indent('  ')
-          o.banner =    "Usage: #{@base_command.script_name} install URL"
-          o.define_head "Install a plugin."
+          o.banner =    "Usage: #{@base_command.script_name} install URL [URL2, URL3]"
+          o.define_head "Install plugin(s) from known URL(s)."
         end
       end
       
@@ -106,8 +106,8 @@ module Sashimi
       def options
         OptionParser.new do |o|
           o.set_summary_indent('  ')
-          o.banner =    "Usage: #{@base_command.script_name} uninstall PLUGIN"
-          o.define_head "Remove an installed plugin."
+          o.banner =    "Usage: #{@base_command.script_name} uninstall PLUGIN [PLUGIN2, PLUGIN3]"
+          o.define_head "Uninstall plugin(s) from local repository."
         end
       end
       
@@ -127,8 +127,8 @@ module Sashimi
       def options
         OptionParser.new do |o|
           o.set_summary_indent('  ')
-          o.banner =    "Usage: #{@base_command.script_name} update PLUGIN"
-          o.define_head "Update an installed plugin."
+          o.banner =    "Usage: #{@base_command.script_name} update PLUGIN [PLUGIN2, PLUGIN3]"
+          o.define_head "Update installed plugin(s)."
         end
       end
       
@@ -136,27 +136,6 @@ module Sashimi
         options.parse!(args)
         args.each do |name|
           Plugin.new(name).update
-        end
-      end
-    end
-
-    class Uninstall
-      def initialize(base_command)
-        @base_command = base_command        
-      end
-      
-      def options
-        OptionParser.new do |o|
-          o.set_summary_indent('  ')
-          o.banner =    "Usage: #{@base_command.script_name} uninstall PLUGIN"
-          o.define_head "Remove an installed plugin."
-        end
-      end
-      
-      def parse!(args)
-        options.parse!(args)
-        args.each do |name|
-          Plugin.new(name).uninstall
         end
       end
     end
