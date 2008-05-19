@@ -3,4 +3,6 @@ $LOAD_PATH.unshift "#{File.dirname(__FILE__)}/../lib"
 require 'sashimi'
 require 'sashimi/commands'
 
+$rails_app = Dir.pwd
+
 Sashimi::Commands::Command.parse!

@@ -1,3 +1,5 @@
+* Made AbstractRepository#remove_hidden_folders platform independent
+
 * Fixed loading in sashimi
 
 * Fixed lib loading in sashimi.rb

@@ -58,6 +58,11 @@ module Sashimi
         @@cache_file
       end
 
+      # Return the path to the Rails app where the user launched sashimi command.
+      def path_to_rails_app
+        $rails_app
+      end
+
       # Read the cache file and return the content as an <tt>Hash</tt>.
       def cache_content
         change_dir_to_local_repository
@@ -166,6 +171,11 @@ module Sashimi
       self.class.plugins_dir
     end
     
+    # Proxy for <tt>AbstractRepository#path_to_rails_app</tt>
+    def path_to_rails_app
+      self.class.path_to_rails_app
+    end
+    
     # Prepare the plugin installation
     def prepare_installation
       FileUtils.mkdir_p(local_repository_path)
@@ -194,14 +204,21 @@ module Sashimi
     
     # Copy a plugin to a Rails app.
     def copy_plugin_to_rails_app
+      change_dir(path_to_rails_app)
       FileUtils.mkdir_p(plugins_dir)
       FileUtils.cp_r(File.join(local_repository_path, plugin.name), File.join(plugins_dir, plugin.name))
     end
     
     # Remove SCM hidden folders.
-    # TODO: make working on Windows platform.
     def remove_hidden_folders
-      system(%(find vendor/plugins/#{plugin.name} -name ".#{scm_type}" -type d -print | xargs rm -rf {}))
+      require 'find'
+      change_dir(File.join(path_to_rails_app, plugins_dir, plugin.name))
+      Find.find('./') do |path|
+        if File.basename(path) == '.'+scm_type
+          FileUtils.remove_dir(path, true)
+          Find.prune
+        end
+      end
     end
     
     # Run the plugin install hook.
