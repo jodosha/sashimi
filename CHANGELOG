@@ -1,3 +1,5 @@
+* *v0.1.0*
+
 * Print on the stdout the plugin name on each command execution
 
 * Fixed shell help output in commands.rb: make clear each command accepts multiple params. Deleted duplicated Update class from commands.rb.
