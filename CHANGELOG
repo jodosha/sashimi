@@ -1,3 +1,5 @@
+* Automatically schedule for SCM add and remove on plugin update, for Rails apps versioned with Svn and Git
+
 * Added --rails option to the Update command in order to update plugins already added to a Rails app [#12 state:resolved]
 
 * Added --rails option to the Install command as alias for the Add command [#11 state:resolved]
