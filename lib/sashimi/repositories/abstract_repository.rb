@@ -56,6 +56,21 @@ module Sashimi
         cache_content.keys.sort
       end
 
+      # Update the plugins installed in a rails app.
+      def update_rails_plugins(plugins_names)
+        change_dir(path_to_rails_app)
+        update_unversioned_rails_plugins(plugins_names) unless under_version_control?
+      end
+
+      # Update the plugins installed in a non versioned rails app.
+      def update_unversioned_rails_plugins(plugins_names)
+        change_dir(plugins_dir)
+        plugins_names.each do |plugin_name|
+          FileUtils.rm_rf(plugin_name)
+          Plugin.new(plugin_name).add
+        end
+      end
+
       def local_repository_path #:nodoc:
         @local_repository_path ||= File.join(find_home, @@local_repository_sub_path) 
       end
@@ -98,6 +113,11 @@ module Sashimi
       # Rails app plugins dir
       def plugins_dir
         @@plugins_dir ||= File.join('vendor', 'plugins')
+      end
+      
+      # Check if the current working directory is under version control
+      def under_version_control?
+        !Dir.glob("{.git, .svn}").empty?
       end
       
       # Find the user home directory

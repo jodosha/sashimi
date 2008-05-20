@@ -42,6 +42,8 @@ module Sashimi
           o.separator "    #{@script_name} update click-to-globalize\n"
           o.separator "  Update all installed plugins:"
           o.separator "    #{@script_name} update --all\n"
+          o.separator "  Update plugin(s) already added to a Rails app:"
+          o.separator "    #{@script_name} update --rails click-to-globalize\n"
           o.separator "  List all installed plugins:"
           o.separator "    #{@script_name} list\n"
           o.separator "  Add installed plugin(s) to a Rails app:"
@@ -139,13 +141,17 @@ module Sashimi
           o.banner =    "Usage: #{@base_command.script_name} update [OPTIONS] PLUGIN [PLUGIN2, PLUGIN3]"
           o.define_head "Update installed plugin(s)."
           o.on("-a", "--all", "Update all installed plugins.") { |@all| }
+          o.on("-r", "--rails", "Install the plugin(s) in a Rails app.") { |@rails| }
         end
       end
       
       def parse!(args)
         options.parse!(args)
+        raise "Can't use both --all and --rails arguments." if @all and @rails
         if @all
           update_plugins(AbstractRepository.plugins_names)
+        elsif @rails
+          AbstractRepository.update_rails_plugins(args)
         else
           update_plugins(args)
         end
