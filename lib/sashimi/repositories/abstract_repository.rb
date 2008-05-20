@@ -85,6 +85,7 @@ module Sashimi
       def update_versioned_rails_plugins(plugins_names)
         change_dir(plugins_dir)
         plugins_names.each do |plugin_name|
+          raise PluginNotFound.new(plugin_name) unless File.exists?(plugin_name)
           repository = Plugin.new(plugin_name).repository
           repository.copy_plugin_and_remove_hidden_folders
           files_scheduled_for_remove = repository.files_scheduled_for_remove
