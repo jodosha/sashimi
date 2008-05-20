@@ -29,6 +29,11 @@ $ sashimi uninstall continuous_builder
 Update a plugin:
 $ sashimi update click-to-globalize
 
+Update a plugin of a Rails app:
+$ sashimi update --rails click-to-globalize
+
+NOTE: If your application is versioned with Svn or Git, Sashimi will automatically schedules for add/remove the added/removed files.
+
 List all installed plugins:
 $ sashimi list
 
