@@ -46,6 +46,8 @@ module Sashimi
           o.separator "    #{@script_name} list\n"
           o.separator "  Add installed plugin(s) to a Rails app:"
           o.separator "    #{@script_name} add click-to-globalize\n"
+          o.separator "  Add installed plugin(s) to a Rails app:"
+          o.separator "    #{@script_name} install --rails click-to-globalize\n"
         end
       end
 
@@ -87,15 +89,20 @@ module Sashimi
       def options
         OptionParser.new do |o|
           o.set_summary_indent('  ')
-          o.banner =    "Usage: #{@base_command.script_name} install URL [URL2, URL3]"
+          o.banner =    "Usage: #{@base_command.script_name} install [OPTIONS] URL [URL2, URL3]"
           o.define_head "Install plugin(s) from known URL(s)."
+          o.on("-r", "--rails", "Install the plugin(s) in a Rails app.") { |@rails| }
         end
       end
       
       def parse!(args)
         options.parse!(args)
-        args.each do |url|
-          Plugin.new(nil, url).install
+        args.each do |url_or_name|
+          if @rails
+            Plugin.new(url_or_name).add
+          else
+            Plugin.new(nil, url_or_name).install
+          end
         end
       end
     end

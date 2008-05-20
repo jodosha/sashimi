@@ -34,6 +34,7 @@ $ sashimi list
 
 Add installed plugin(s) to a Rails app:
 $ sashimi add click-to-globalize
+$ sashimi install --rails click-to-globalize
 
 
 
