@@ -40,6 +40,8 @@ module Sashimi
           o.separator "    #{@script_name} uninstall continuous_builder\n"
           o.separator "  Update a plugin:"
           o.separator "    #{@script_name} update click-to-globalize\n"
+          o.separator "  Update all installed plugins:"
+          o.separator "    #{@script_name} update --all\n"
           o.separator "  List all installed plugins:"
           o.separator "    #{@script_name} list\n"
           o.separator "  Add installed plugin(s) to a Rails app:"
@@ -79,7 +81,7 @@ module Sashimi
     
     class Install
       def initialize(base_command)
-        @base_command = base_command        
+        @base_command = base_command
       end
       
       def options
@@ -100,7 +102,7 @@ module Sashimi
   
     class Uninstall
       def initialize(base_command)
-        @base_command = base_command        
+        @base_command = base_command
       end
       
       def options
@@ -121,21 +123,30 @@ module Sashimi
     
     class Update
       def initialize(base_command)
-        @base_command = base_command        
+        @base_command = base_command
       end
       
       def options
         OptionParser.new do |o|
           o.set_summary_indent('  ')
-          o.banner =    "Usage: #{@base_command.script_name} update PLUGIN [PLUGIN2, PLUGIN3]"
+          o.banner =    "Usage: #{@base_command.script_name} update [OPTIONS] PLUGIN [PLUGIN2, PLUGIN3]"
           o.define_head "Update installed plugin(s)."
+          o.on("-a", "--all", "Update all installed plugins.") { |@all| }
         end
       end
       
       def parse!(args)
         options.parse!(args)
-        args.each do |name|
-          Plugin.new(name).update
+        if @all
+          update_plugins(AbstractRepository.plugins_names)
+        else
+          update_plugins(args)
+        end
+      end
+      
+      def update_plugins(plugins)
+        plugins.each do |plugin|
+          Plugin.new(plugin).update
         end
       end
     end

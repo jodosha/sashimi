@@ -44,6 +44,12 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     end
   end
   
+  def test_should_return_all_installed_plugins_names
+    initialize_repository_for_test do
+      assert_equal(['plug-in', 'plugin'], AbstractRepository.plugins_names)
+    end
+  end
+  
   # DIRECTORIES
   def test_should_change_current_dir
     repository.change_dir(repository.class.find_home)
