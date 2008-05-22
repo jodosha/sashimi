@@ -71,3 +71,15 @@ module Sashimi
       :change_dir_to_plugin_path, :plugins_dir, :copy_plugin_to_rails_app
   end
 end
+
+# Thanks to Rails Core Team
+def uses_mocha(description)
+  require 'rubygems'
+  require 'mocha'
+  yield
+rescue LoadError
+  $stderr.puts "Skipping #{description} tests. `gem install mocha` and try again."
+end
+
+def puts(message) #shut-up!
+end
