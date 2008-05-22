@@ -1,3 +1,5 @@
+* Removed AbstractRepository#cache_file, now uses cattr_accessor
+
 * Updated annotation for AbstractRepository public methods in test/test_helper.rb
 
 * Introduced Class#class_method_proxy in order to make available annotated class methods as private methods

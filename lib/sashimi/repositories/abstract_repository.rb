@@ -13,6 +13,8 @@ module Sashimi
   class AbstractRepository
     @@local_repository_sub_path = File.join('.rails', 'plugins')
     @@cache_file = '.plugins'
+    cattr_accessor :cache_file
+    
     attr_accessor :plugin
     
     def initialize(plugin)
@@ -115,10 +117,6 @@ module Sashimi
 
       def local_repository_path #:nodoc:
         @local_repository_path ||= File.join(find_home, @@local_repository_sub_path) 
-      end
-
-      def cache_file #:nodoc:
-        @@cache_file
       end
 
       # Return the path to the Rails app where the user launched sashimi command.
