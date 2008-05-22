@@ -1,3 +1,21 @@
+* Introduced Class#class_method_proxy in order to make available annotated class methods as private methods
+  
+  Example:
+    class Repository
+      def self.path
+        @@path
+      end
+    
+      class_method_proxy :path
+    end
+
+  Produces:
+    # Proxy method for <tt>Repository#path</tt>
+    def path
+      self.class.path
+    end
+    private :path
+
 * Improved tests for repositories system calls
 
 

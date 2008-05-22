@@ -234,52 +234,16 @@ module Sashimi
       FileUtils.rm_rf(plugin.name+'-tmp')
     end
     
+    class_method_proxy :change_dir, :change_dir_to_local_repository,
+      :change_dir_to_absolute_plugins_dir, :local_repository_path,
+      :cache_file, :cache_content, :plugins_dir, :path_to_rails_app
+
   private
-    # Proxy for <tt>AbstractRepository#change_dir</tt>
-    def change_dir(dir)
-      self.class.change_dir(dir)
-    end
-    
-    # Proxy for <tt>AbstractRepository#change_dir_to_local_repository</tt>
-    def change_dir_to_local_repository
-      self.class.change_dir_to_local_repository
-    end
-    
-    # Proxy for <tt>AbstractRepository#change_dir_to_absolute_plugins_dir</tt>
-    def change_dir_to_absolute_plugins_dir
-      self.class.change_dir_to_absolute_plugins_dir
-    end
-    
     # Change the current directory with the plugin one
     def change_dir_to_plugin_path
       change_dir(File.join(local_repository_path, plugin.name || plugin.guess_name))
     end
 
-    # Proxy for <tt>AbstractRepository#local_repository_path</tt>
-    def local_repository_path
-      self.class.local_repository_path
-    end
-    
-    # Proxy for <tt>AbstractRepository#cache_file</tt>
-    def cache_file
-      self.class.cache_file
-    end
-    
-    # Proxy for <tt>AbstractRepository#cache_content</tt>
-    def cache_content
-      self.class.cache_content
-    end
-    
-    # Proxy for <tt>AbstractRepository#plugins_dir</tt>
-    def plugins_dir
-      self.class.plugins_dir
-    end
-    
-    # Proxy for <tt>AbstractRepository#path_to_rails_app</tt>
-    def path_to_rails_app
-      self.class.path_to_rails_app
-    end
-    
     # Prepare the plugin installation
     def prepare_installation
       FileUtils.mkdir_p(local_repository_path)
