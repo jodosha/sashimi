@@ -65,10 +65,13 @@ end
 module Sashimi
   class AbstractRepository
     @@local_repository_sub_path = 'sashimi_test/.rails/plugins'
-    public :local_repository_path, :change_dir, :prepare_installation,
-      :cache_file, :add_to_cache, :remove_from_cache,
-      :cache_content, :change_dir_to_local_repository,
-      :change_dir_to_plugin_path, :plugins_dir, :copy_plugin_to_rails_app
+    public :add_to_cache, :cache_content, :cache_file,
+      :change_dir, :change_dir_to_absolute_plugins_dir,
+      :change_dir_to_local_repository, :change_dir_to_plugin_path,
+      :copy_plugin_to_rails_app, :local_repository_path, :path_to_rails_app,
+      :plugins_dir, :prepare_installation, :remove_from_cache,
+      :remove_hidden_folders, :rename_temp_folder, :run_install_hook,
+      :write_to_cache
   end
 end
 
