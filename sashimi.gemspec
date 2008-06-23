@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.has_rdoc           = true
   s.rubyforge_project  = %q{sashimi}
   s.executables        = [ 'sashimi' ]
-  s.files              = ["CHANGELOG", "MIT-LICENSE", "Rakefile", "README", "sashimi.gemspec", "setup.rb", "bin/sashimi", "lib/sashimi/commands.rb", "lib/sashimi/plugin.rb", "lib/sashimi/repositories/abstract_repository.rb", "lib/sashimi/repositories/git_repository.rb", "lib/sashimi/repositories/svn_repository.rb", "lib/sashimi/repositories.rb", "lib/sashimi.rb", "test/test_helper.rb", "test/unit/plugin_test.rb", "test/unit/repositories/abstract_repository_test.rb", "test/unit/repositories/git_repository_test.rb", "test/unit/repositories/svn_repository_test.rb"]
-  s.test_files         = ["test/unit/plugin_test.rb", "test/unit/repositories/abstract_repository_test.rb", "test/unit/repositories/git_repository_test.rb", "test/unit/repositories/svn_repository_test.rb"]
+  s.files              = Dir['**/*'].reject {|f| File.directory?(f)}.sort
+  s.test_files         = Dir['test/**/*_test.rb'].reject {|f| File.directory?(f)}.sort
   s.extra_rdoc_files   = ['README', 'CHANGELOG']
   
   s.add_dependency("activesupport", ["> 0.0.0"])
