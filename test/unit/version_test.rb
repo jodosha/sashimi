@@ -3,6 +3,6 @@ require 'test/test_helper'
 
 class VersionTest < Test::Unit::TestCase
   def test_version
-    assert_equal '0.1.5', Sashimi::VERSION::STRING
+    assert_equal '0.1.7', Sashimi::VERSION::STRING
   end
 end
