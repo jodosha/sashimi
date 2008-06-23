@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name               = "sashimi"
-  s.version            = "0.1.5"
-  s.date               = "2008-05-20"
+  s.version            = "0.1.6"
+  s.date               = "2008-06-23"
   s.summary            = "Rails plugins manager"
   s.author             = "Luca Guidi"
   s.email              = "guidi.luca@gmail.com"
