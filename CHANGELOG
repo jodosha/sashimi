@@ -1,3 +1,9 @@
+* Massive changelog
+
+* Added rubyforge project reference to gemspec
+
+* Added sashimi*.gem to .gitignore
+
 * Removed AbstractRepository#cache_file, now uses cattr_accessor
 
 * Updated annotation for AbstractRepository public methods in test/test_helper.rb
