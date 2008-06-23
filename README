@@ -10,6 +10,10 @@ The main goal is to allow the plugins offline installation.
 Installation
 ============
 
+$ (sudo) gem install sashimi
+
+or
+
 $ (sudo) gem install jodosha-sashimi --source=http://gems.github.com
 
 
