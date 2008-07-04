@@ -21,8 +21,8 @@ class Class
     method_names.each do |m|
       self.class_eval %{
         # Proxy method for <tt>#{self.class.name}##{m}</tt>
-        def #{m}(*args)
-          self.class.#{m}(*args)
+        def #{m}(*args, &block)
+          self.class.#{m}(*args, &block)
         end
         private :#{m}
       }, __FILE__, __LINE__

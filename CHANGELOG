@@ -1,3 +1,7 @@
+* Added block support to Class#class_method_proxy
+
+
+
 * *v0.1.7*
 
 * Tagged v0.1.7
