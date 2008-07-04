@@ -1,8 +1,7 @@
 module Sashimi
   class PluginNotFound < StandardError #:nodoc:
     def initialize(plugin_name, message = nil)
-      @plugin_name = plugin_name
-      @message     = message
+      @plugin_name, @message = plugin_name, message
     end
 
     def to_s
@@ -23,10 +22,11 @@ module Sashimi
     
     # Remove the repository
     def uninstall
-      change_dir_to_local_repository
-      raise PluginNotFound.new(plugin.name) unless File.exists?(plugin.name)
-      FileUtils.rm_rf(plugin.name)
-      remove_from_cache
+      with_path local_repository_path do
+        raise PluginNotFound.new(plugin.name) unless File.exists?(plugin.name)
+        FileUtils.rm_rf(plugin.name)
+        remove_from_cache
+      end
     end
     
     # Add to a Rails app.
@@ -45,11 +45,13 @@ module Sashimi
 
     class << self
       def instantiate_repository(plugin)
-        unless plugin.name.nil?
-          instantiate_repository_by_cache(plugin)
-        else
-          instantiate_repository_by_url(plugin)
-        end.new(plugin)
+        with_path local_repository_path do
+          unless plugin.name.nil?
+            instantiate_repository_by_cache(plugin)
+          else
+            instantiate_repository_by_url(plugin)
+          end.new(plugin)
+        end
       end
 
       # Return all installed plugin names and summary, formatted for stdout.
@@ -66,20 +68,22 @@ module Sashimi
 
       # Update the plugins installed in a rails app.
       def update_rails_plugins(plugins_names)
-        change_dir(path_to_rails_app)
-        if under_version_control?
-          update_versioned_rails_plugins(plugins_names)
-        else
-          update_unversioned_rails_plugins(plugins_names)
+        with_path path_to_rails_app do
+          if under_version_control?
+            update_versioned_rails_plugins(plugins_names)
+          else
+            update_unversioned_rails_plugins(plugins_names)
+          end
         end
       end
 
       # Update the plugins installed in a non versioned rails app.
       def update_unversioned_rails_plugins(plugins_names)
-        change_dir(plugins_dir)
-        plugins_names.each do |plugin_name|
-          FileUtils.rm_rf(plugin_name)
-          Plugin.new(plugin_name).add
+        with_path plugins_dir do
+          plugins_names.each do |plugin_name|
+            FileUtils.rm_rf(plugin_name)
+            Plugin.new(plugin_name).add
+          end
         end
       end
 
@@ -126,8 +130,9 @@ module Sashimi
 
       # Read the cache file and return the content as an <tt>Hash</tt>.
       def cache_content
-        change_dir_to_local_repository
-        @@cache_content ||= (YAML::load_file(cache_file) || {}).to_hash
+        with_path local_repository_path do
+          @@cache_content ||= (YAML::load_file(cache_file) || {}).to_hash
+        end
       end
 
       def instantiate_repository_by_url(plugin)
@@ -139,26 +144,17 @@ module Sashimi
         raise PluginNotFound.new(plugin.name) if cached_plugin.nil?
         cached_plugin['type'] == 'git' ? GitRepository : SvnRepository
       end
-
-      # Changes the current directory with the given one
-      def change_dir(dir)
-        FileUtils.cd(dir)
-      end
-      
-      # Change the current directory with local_repository_path
-      def change_dir_to_local_repository
-        change_dir(local_repository_path)
-      end
-      
+            
       # Change the current directory with the fully qualified
       # path to Rails app and plugins_dir.
-      def change_dir_to_absolute_plugins_dir
-        change_dir(File.join(File.expand_path(path_to_rails_app), plugins_dir))
+      def absolute_rails_plugins_path
+        @@absolute_rails_plugins_path ||= File.join(File.expand_path(path_to_rails_app),
+          rails_plugins_path)
       end
       
       # Rails app plugins dir
-      def plugins_dir
-        @@plugins_dir ||= File.join('vendor', 'plugins')
+      def rails_plugins_path
+        @@rails_plugins_path ||= File.join('vendor', 'plugins')
       end
       
       # Check if the current working directory is under version control
@@ -194,6 +190,16 @@ module Sashimi
       def git_url?(url)
         url =~ /^git:\/\// || url =~ /\.git$/
       end
+      
+      def with_path(path, &block)
+        begin
+          old_path = Dir.pwd
+          FileUtils.cd(path)
+          yield
+        ensure
+          FileUtils.cd(old_path)
+        end
+      end
     end
 
     # Return the SCM type
@@ -207,46 +213,51 @@ module Sashimi
     # Read the content of the <tt>about.yml</tt>.
     # New feature of Rails 2.1.x http:://dev.rubyonrails.org/changeset/9098
     def about
-      change_dir_to_plugin_path
-      return {} unless File.exists?('about.yml')
-      (YAML::load_file('about.yml') || {}).to_hash
+      with_path plugin_path do
+        return {} unless File.exists?('about.yml')
+        (YAML::load_file('about.yml') || {}).to_hash
+      end
     end
 
     # Returns a list of files that should be scheduled for SCM add.
     def files_scheduled_for_add
-      change_dir_to_absolute_plugins_dir
-      Dir[plugin.name+"-tmp/**/*"].collect {|fn| fn.gsub(plugin.name+'-tmp', '.')} -
-        Dir[plugin.name+"/**/*"].collect{|fn| fn.gsub(plugin.name, '.')}
+      with_path absolute_rails_plugins_path do
+        Dir[plugin.name+"-tmp/**/*"].collect {|fn| fn.gsub(plugin.name+'-tmp', '.')} -
+          Dir[plugin.name+"/**/*"].collect{|fn| fn.gsub(plugin.name, '.')}
+      end
     end
     
     # Returns a list of files that should be scheduled for SCM remove.
     def files_scheduled_for_remove
-      change_dir_to_absolute_plugins_dir
-      Dir[plugin.name+"/**/*"].collect {|fn| fn.gsub(plugin.name, '.')} -
-        Dir[plugin.name+"-tmp/**/*"].collect {|fn| fn.gsub(plugin.name+"-tmp", '.')}
+      with_path absolute_rails_plugins_path do
+        Dir[plugin.name+"/**/*"].collect {|fn| fn.gsub(plugin.name, '.')} -
+          Dir[plugin.name+"-tmp/**/*"].collect {|fn| fn.gsub(plugin.name+"-tmp", '.')}
+      end
     end
     
     # Remove the temp folder, used by update process.
     def remove_temp_folder
-      change_dir_to_absolute_plugins_dir
-      FileUtils.rm_rf(plugin.name+'-tmp')
+      with_path absolute_rails_plugins_path do
+        FileUtils.rm_rf(plugin.name+'-tmp')
+      end
     end
     
-    class_method_proxy :change_dir, :change_dir_to_local_repository,
-      :change_dir_to_absolute_plugins_dir, :local_repository_path,
-      :cache_file, :cache_content, :plugins_dir, :path_to_rails_app
+    class_method_proxy :local_repository_path, :cache_file,
+      :cache_content, :path_to_rails_app, :rails_plugins_path,
+      :with_path
 
   private
-    # Change the current directory with the plugin one
-    def change_dir_to_plugin_path
-      change_dir(File.join(local_repository_path, plugin.name || plugin.guess_name))
+    # Returns the path to the plugin
+    def plugin_path
+      File.join(local_repository_path, plugin.name || plugin.guess_name)
     end
 
     # Prepare the plugin installation
     def prepare_installation
       FileUtils.mkdir_p(local_repository_path)
-      change_dir_to_local_repository
-      FileUtils.touch(cache_file)
+      with_path local_repository_path do
+        FileUtils.touch(cache_file)
+      end
     end
     
     # Add a plugin into the cache
@@ -262,17 +273,20 @@ module Sashimi
 
     # Write all the plugins into the cache
     def write_to_cache(plugins)
-      change_dir_to_local_repository
-      FileUtils.mv(cache_file, "#{cache_file}-backup")
-      File.open(cache_file, 'w'){|f| f.write(plugins.to_yaml)}
-      FileUtils.rm("#{cache_file}-backup")
+      with_path local_repository_path do
+        FileUtils.mv(cache_file, "#{cache_file}-backup")
+        File.open(cache_file, 'w'){|f| f.write(plugins.to_yaml)}
+        FileUtils.rm("#{cache_file}-backup")
+      end
     end
     
     # Copy a plugin to a Rails app.
     def copy_plugin_to_rails_app
-      change_dir(path_to_rails_app)
-      FileUtils.mkdir_p(plugins_dir)
-      FileUtils.cp_r(File.join(local_repository_path, plugin.name), File.join(plugins_dir, plugin.name+'-tmp'))
+      with_path path_to_rails_app do
+        FileUtils.mkdir_p(plugins_path)
+        FileUtils.cp_r(File.join(local_repository_path, plugin.name),
+          File.join(plugins_path, plugin.name+'-tmp'))
+      end
     end
     
     # Rename the *-tmp folder used by the installation process.
@@ -280,18 +294,21 @@ module Sashimi
     # Example:
     #   click-to-globalize-tmp # => click-to-globalize
     def rename_temp_folder
-      change_dir(path_to_rails_app)
-      FileUtils.mv(File.join(plugins_dir, plugin.name+'-tmp'), File.join(plugins_dir, plugin.name))
+      with_path path_to_rails_app do
+        FileUtils.mv(File.join(plugins_dir, plugin.name+'-tmp'),
+          File.join(plugins_dir, plugin.name))
+      end
     end
     
     # Remove SCM hidden folders.
     def remove_hidden_folders
       require 'find'
-      change_dir(File.join(path_to_rails_app, plugins_dir, plugin.name+'-tmp'))
-      Find.find('./') do |path|
-        if File.basename(path) == '.'+scm_type
-          FileUtils.remove_dir(path, true)
-          Find.prune
+      with_path File.join(absolute_rails_plugins_path, plugin.name + '-tmp') do
+        Find.find('./') do |path|
+          if File.basename(path) == '.'+scm_type
+            FileUtils.remove_dir(path, true)
+            Find.prune
+          end
         end
       end
     end

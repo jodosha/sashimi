@@ -19,8 +19,8 @@ class SvnRepositoryTest < Test::Unit::TestCase
       assert_raise(Errno::ENOENT) { repository.install }      
     end
     
-    def test_should_create_git_repository
-      initialize_repository_for_test do
+    def test_should_create_svn_repository
+      repository.with_path plugins_path do
         FileUtils.mkdir_p('sashimi')
         Kernel.expects(:system).with('svn co http://dev.repository.com/svn/sashimi/trunk sashimi')
         SvnRepository.new(create_plugin(nil, 'http://dev.repository.com/svn/sashimi/trunk')).install

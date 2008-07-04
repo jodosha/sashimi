@@ -20,7 +20,7 @@ class GitRepositoryTest < Test::Unit::TestCase
     end
     
     def test_should_create_git_repository
-      initialize_repository_for_test do
+      repository.with_path plugins_path do
         FileUtils.mkdir_p('sashimi')
         Kernel.expects(:system).with('git clone git://github.com/jodosha/sashimi.git')
         GitRepository.new(plugin).install

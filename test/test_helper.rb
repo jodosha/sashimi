@@ -9,12 +9,27 @@ class Test::Unit::TestCase
   end
   
 private
-  def initialize_repository_for_test(&block)
-    repository.prepare_installation
-    create_cache_file
-    create_plugin_directories
-    yield
-    remove_local_repository_path # make sure of clean up tmp dirs
+  def create_test_repository
+    prepare_installation
+    with_path plugins_path do
+      create_cache_file
+      create_plugin_directories
+    end
+  end
+
+  def destroy_test_repository
+    FileUtils.rm_rf(local_repository_path)
+  end
+
+  alias_method :setup, :create_test_repository
+  alias_method :teardown, :destroy_test_repository
+
+  def local_repository_path
+    @local_repository_path ||= File.join(repository.class.find_home, 'sashimi_test')
+  end
+
+  def plugins_path
+    @plugins_path ||= File.join(local_repository_path, '.rails', 'plugins')
   end
 
   def repository
@@ -22,7 +37,7 @@ private
   end
 
   def create_repository(plugin_name = 'sashimi', url = 'git://github.com/jodosha/sashimi.git')
-    @repository ||= AbstractRepository.new(Plugin.new(plugin_name, url))
+    AbstractRepository.new(Plugin.new(plugin_name, url))
   end
 
   def plugin
@@ -39,6 +54,10 @@ private
       'plug-in' => {'type' => 'svn'} }
   end
 
+  def cache_file
+    '.plugins'
+  end
+
   def create_plugin_directories
     { 'plugin' => true, 'plug-in' => false }.each do |plugin, about|
       create_plugin_directory(plugin, about)
@@ -46,32 +65,44 @@ private
   end
 
   def create_plugin_directory(plugin, about = true)
-    AbstractRepository.change_dir_to_local_repository
     FileUtils.mkdir(plugin) unless File.exists?(plugin)
     FileUtils.cd(plugin)
     File.open('about.yml', 'w+'){|f| f.write({'summary' => "Plugin summary"}.to_yaml)} if about
-    AbstractRepository.change_dir_to_local_repository
+  end
+
+  def prepare_installation
+    FileUtils.mkdir_p(plugins_path)
   end
 
   def create_cache_file
-    File.open(repository.cache_file, 'w+'){|f| f.write(cached_plugin.to_yaml)}
+    File.open(cache_file, 'w+'){|f| f.write(cached_plugin.to_yaml)}
   end
-
-  def remove_local_repository_path
-    FileUtils.rm_rf(File.join(repository.class.find_home, 'sashimi_test'))
-  end  
+  
+  def with_local_repository_path(&block)
+    with_path(local_repository_path, &block)
+  end
+  
+  # FIXME why often Dir.pwd returns nil ?
+  def with_path(path, &block)
+    begin
+      old_path = Dir.pwd rescue plugins_path
+      FileUtils.cd(path)
+      yield
+    ensure
+      FileUtils.cd(old_path)
+    end
+  end
 end
 
 module Sashimi
   class AbstractRepository
     @@local_repository_sub_path = 'sashimi_test/.rails/plugins'
+    cattr_accessor :local_repository_sub_path
     public :add_to_cache, :cache_content, :cache_file,
-      :change_dir, :change_dir_to_absolute_plugins_dir,
-      :change_dir_to_local_repository, :change_dir_to_plugin_path,
       :copy_plugin_to_rails_app, :local_repository_path, :path_to_rails_app,
-      :plugins_dir, :prepare_installation, :remove_from_cache,
+      :prepare_installation, :remove_from_cache, :rails_plugins_path,
       :remove_hidden_folders, :rename_temp_folder, :run_install_hook,
-      :write_to_cache
+      :write_to_cache, :with_path, :plugin_path
   end
 end
 

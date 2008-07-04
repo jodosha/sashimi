@@ -9,8 +9,9 @@ module Sashimi
     
     def update
       puts plugin.name.titleize + "\n\n"
-      change_dir_to_plugin_path
-      Kernel.system('git pull')
+      with_path plugin_path do
+        Kernel.system('git pull')
+      end
     end
   end
 end
