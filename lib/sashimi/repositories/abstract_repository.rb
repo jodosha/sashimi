@@ -10,14 +10,14 @@ module Sashimi
   end
   
   class AbstractRepository
-    @@local_repository_sub_path = File.join('.rails', 'plugins')
+    @@plugins_path = File.join('.rails', 'plugins')
     @@cache_file = '.plugins'
     cattr_accessor :cache_file
     
-    attr_accessor :plugin
+    attr_reader :plugin
     
     def initialize(plugin)
-      self.plugin = plugin
+      @plugin = plugin
     end
     
     # Remove the repository
@@ -31,6 +31,7 @@ module Sashimi
     
     # Add to a Rails app.
     def add
+      raise PluginNotFound.new(plugin.name) unless cache_content.keys.include?(plugin.name)
       puts plugin.name.titleize + "\n"
       copy_plugin_and_remove_hidden_folders
       rename_temp_folder
@@ -40,7 +41,7 @@ module Sashimi
     # Copy a plugin to a Rails app and remove SCM hidden folders
     def copy_plugin_and_remove_hidden_folders
       copy_plugin_to_rails_app
-      remove_hidden_folders      
+      remove_hidden_folders
     end
 
     class << self
@@ -79,7 +80,7 @@ module Sashimi
 
       # Update the plugins installed in a non versioned rails app.
       def update_unversioned_rails_plugins(plugins_names)
-        with_path plugins_dir do
+        with_path rails_plugins_path do
           plugins_names.each do |plugin_name|
             FileUtils.rm_rf(plugin_name)
             Plugin.new(plugin_name).add
@@ -120,7 +121,7 @@ module Sashimi
       end
 
       def local_repository_path #:nodoc:
-        @local_repository_path ||= File.join(find_home, @@local_repository_sub_path) 
+        @local_repository_path ||= File.join(find_home, @@plugins_path) 
       end
 
       # Return the path to the Rails app where the user launched sashimi command.
@@ -244,7 +245,7 @@ module Sashimi
     
     class_method_proxy :local_repository_path, :cache_file,
       :cache_content, :path_to_rails_app, :rails_plugins_path,
-      :with_path
+      :with_path, :absolute_rails_plugins_path
 
   private
     # Returns the path to the plugin
@@ -282,11 +283,9 @@ module Sashimi
     
     # Copy a plugin to a Rails app.
     def copy_plugin_to_rails_app
-      with_path path_to_rails_app do
-        FileUtils.mkdir_p(plugins_path)
-        FileUtils.cp_r(File.join(local_repository_path, plugin.name),
-          File.join(plugins_path, plugin.name+'-tmp'))
-      end
+      FileUtils.mkdir_p(plugins_path)
+      FileUtils.cp_r(File.join(local_repository_path, plugin.name),
+        File.join(rails_plugins_path, plugin.name+'-tmp'))
     end
     
     # Rename the *-tmp folder used by the installation process.
@@ -294,10 +293,8 @@ module Sashimi
     # Example:
     #   click-to-globalize-tmp # => click-to-globalize
     def rename_temp_folder
-      with_path path_to_rails_app do
-        FileUtils.mv(File.join(plugins_dir, plugin.name+'-tmp'),
-          File.join(plugins_dir, plugin.name))
-      end
+      FileUtils.mv(File.join(rails_plugins_path, plugin.name+'-tmp'),
+        File.join(rails_plugins_path, plugin.name))
     end
     
     # Remove SCM hidden folders.
@@ -315,7 +312,7 @@ module Sashimi
     
     # Run the plugin install hook.
     def run_install_hook
-      install_hook_file = File.join(plugins_dir, plugin.name, 'install.rb')
+      install_hook_file = File.join(rails_plugins_path, plugin.name, 'install.rb')
       load install_hook_file if File.exist? install_hook_file
     end
   end

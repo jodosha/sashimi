@@ -8,12 +8,19 @@ class Test::Unit::TestCase
     assert !condition, message
   end
   
+  # Asserts the given path exists
+  # It accepts path/to/be/asserted and automatically make it cross platform.
+  def assert_path_exists(path)
+    assert File.exists?(path.to_path)
+  end
+  
 private
   def create_test_repository
     prepare_installation
     with_path plugins_path do
       create_cache_file
       create_plugin_directories
+      create_rails_app
     end
   end
 
@@ -32,16 +39,24 @@ private
     @plugins_path ||= File.join(local_repository_path, '.rails', 'plugins')
   end
 
+  def rails_app_path
+    @rails_app_path ||= begin 
+      path = File.join(local_repository_path, '.rails', 'rails_app')
+      $rails_app = path
+      path
+    end
+  end
+
   def repository
-    create_repository
+    @repository ||= create_repository
+  end
+
+  def plugin
+    @plugin ||= create_plugin(nil, 'git://github.com/jodosha/sashimi.git')
   end
 
   def create_repository(plugin_name = 'sashimi', url = 'git://github.com/jodosha/sashimi.git')
     AbstractRepository.new(Plugin.new(plugin_name, url))
-  end
-
-  def plugin
-    create_plugin(nil, 'git://github.com/jodosha/sashimi.git')
   end
   
   def create_plugin(name, url = nil)
@@ -59,15 +74,20 @@ private
   end
 
   def create_plugin_directories
-    { 'plugin' => true, 'plug-in' => false }.each do |plugin, about|
+    { 'sashimi' => true, 'plugin' => true, 'plug-in' => false }.each do |plugin, about|
       create_plugin_directory(plugin, about)
     end
   end
 
   def create_plugin_directory(plugin, about = true)
     FileUtils.mkdir(plugin) unless File.exists?(plugin)
-    FileUtils.cd(plugin)
-    File.open('about.yml', 'w+'){|f| f.write({'summary' => "Plugin summary"}.to_yaml)} if about
+    File.open(File.join(plugin, 'about.yml'), 'w+') do |f|
+      f.write({'summary' => "Plugin summary"}.to_yaml)
+    end if about
+  end
+
+  def create_rails_app
+    FileUtils.mkdir_p(File.join(rails_app_path, 'vendor', 'plugins'))
   end
 
   def prepare_installation
@@ -96,8 +116,8 @@ end
 
 module Sashimi
   class AbstractRepository
-    @@local_repository_sub_path = 'sashimi_test/.rails/plugins'
-    cattr_accessor :local_repository_sub_path
+    @@plugins_path = 'sashimi_test/.rails/plugins'
+    cattr_accessor :plugins_path
     public :add_to_cache, :cache_content, :cache_file,
       :copy_plugin_to_rails_app, :local_repository_path, :path_to_rails_app,
       :prepare_installation, :remove_from_cache, :rails_plugins_path,
