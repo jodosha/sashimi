@@ -68,10 +68,10 @@ private
     Plugin.new(name, url)
   end
 
-  def cached_plugin
-    { 'sashimi' => {'type' => 'git'}, 
+  def cached_plugins
+    { 'plug-in' => {'type' => 'svn'},
       'plugin'  => {'type' => 'svn'},
-      'plug-in' => {'type' => 'svn'} }
+      'sashimi' => {'type' => 'git'} }
   end
 
   def cache_file
@@ -100,7 +100,7 @@ private
   end
 
   def create_cache_file
-    File.open(cache_file, 'w+'){|f| f.write(cached_plugin.to_yaml)}
+    File.open(cache_file, 'w+'){|f| f.write(cached_plugins.to_yaml)}
   end
   
   def with_local_repository_path(&block)

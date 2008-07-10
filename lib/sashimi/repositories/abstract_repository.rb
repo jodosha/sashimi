@@ -117,7 +117,7 @@ module Sashimi
       # Execute the given command for the current SCM system used by the Rails app.
       def scm_command(command, file)
         scm = guess_version_control_system
-        system("#{scm} #{command} #{file}")
+        Kernel.system("#{scm} #{command} #{file}")
       end
 
       def local_repository_path #:nodoc:
