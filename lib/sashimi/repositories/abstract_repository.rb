@@ -10,7 +10,7 @@ module Sashimi
   end
   
   class AbstractRepository
-    @@plugins_path = File.join('.rails', 'plugins')
+    @@plugins_path = ".rails/plugins".to_path
     @@cache_file = '.plugins'
     cattr_accessor :cache_file
     
@@ -119,7 +119,7 @@ module Sashimi
       end
 
       def local_repository_path #:nodoc:
-        @local_repository_path ||= File.join(find_home, @@plugins_path) 
+        @local_repository_path ||= [ find_home, @@plugins_path ].to_path
       end
 
       # Return the path to the Rails app where the user launched sashimi command.
@@ -147,13 +147,13 @@ module Sashimi
       # Change the current directory with the fully qualified
       # path to Rails app and plugins_dir.
       def absolute_rails_plugins_path
-        @@absolute_rails_plugins_path ||= File.join(File.expand_path(path_to_rails_app),
-          rails_plugins_path)
+        @@absolute_rails_plugins_path ||= [ path_to_rails_app,
+          rails_plugins_path ].to_path(true)
       end
       
       # Rails app plugins dir
       def rails_plugins_path
-        @@rails_plugins_path ||= File.join('vendor', 'plugins')
+        @@rails_plugins_path ||= "vendor/plugins".to_path
       end
       
       # Check if the current working directory is under version control
@@ -248,7 +248,7 @@ module Sashimi
   private
     # Returns the path to the plugin
     def plugin_path
-      File.join(local_repository_path, plugin.name || plugin.guess_name)
+      [ local_repository_path, plugin.name || plugin.guess_name ].to_path
     end
 
     # Prepare the plugin installation
@@ -282,8 +282,8 @@ module Sashimi
     # Copy a plugin to a Rails app.
     def copy_plugin_to_rails_app
       FileUtils.mkdir_p(plugins_path)
-      FileUtils.cp_r(File.join(local_repository_path, plugin.name),
-        File.join(rails_plugins_path, plugin.name+'-tmp'))
+      FileUtils.cp_r [ local_repository_path, plugin.name ].to_path,
+        [ rails_plugins_path, plugin.name+'-tmp'].to_path
     end
     
     # Rename the *-tmp folder used by the installation process.
@@ -291,14 +291,14 @@ module Sashimi
     # Example:
     #   click-to-globalize-tmp # => click-to-globalize
     def rename_temp_folder
-      FileUtils.mv(File.join(rails_plugins_path, plugin.name+'-tmp'),
-        File.join(rails_plugins_path, plugin.name))
+      FileUtils.mv [ rails_plugins_path, plugin.name+'-tmp' ].to_path,
+        [ rails_plugins_path, plugin.name ].to_path
     end
     
     # Remove SCM hidden folders.
     def remove_hidden_folders
       require 'find'
-      with_path File.join(absolute_rails_plugins_path, plugin.name + '-tmp') do
+      with_path [ absolute_rails_plugins_path, plugin.name + '-tmp' ].to_path do
         Find.find('./') do |path|
           if File.basename(path) == '.'+scm_type
             FileUtils.remove_dir(path, true)
@@ -310,7 +310,7 @@ module Sashimi
     
     # Run the plugin install hook.
     def run_install_hook
-      install_hook_file = File.join(rails_plugins_path, plugin.name, 'install.rb')
+      install_hook_file = [ rails_plugins_path, plugin.name, 'install.rb' ].to_path
       load install_hook_file if File.exist? install_hook_file
     end
   end

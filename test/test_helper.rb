@@ -30,23 +30,23 @@ private
   end
 
   def destroy_test_repository
-    FileUtils.rm_rf(local_repository_path)
+    FileUtils.rm_rf local_repository_path
   end
 
   alias_method :setup, :create_test_repository
   alias_method :teardown, :destroy_test_repository
 
   def local_repository_path
-    @local_repository_path ||= File.join(repository.class.find_home, 'sashimi_test')
+    @local_repository_path ||= [ repository.class.find_home, 'sashimi_test' ].to_path
   end
 
   def plugins_path
-    @plugins_path ||= File.join(local_repository_path, '.rails', 'plugins')
+    @plugins_path ||= [ local_repository_path, '.rails', 'plugins' ].to_path
   end
 
   def rails_app_path
     @rails_app_path ||= begin 
-      path = File.join(local_repository_path, '.rails', 'rails_app')
+      path = [ local_repository_path, '.rails', 'rails_app' ].to_path
       $rails_app = path
       path
     end
@@ -57,11 +57,11 @@ private
   end
 
   def plugin
-    @plugin ||= create_plugin(nil, 'git://github.com/jodosha/sashimi.git')
+    @plugin ||= create_plugin nil, 'git://github.com/jodosha/sashimi.git'
   end
 
   def create_repository(plugin_name = 'sashimi', url = 'git://github.com/jodosha/sashimi.git')
-    AbstractRepository.new(Plugin.new(plugin_name, url))
+    AbstractRepository.new Plugin.new(plugin_name, url)
   end
   
   def create_plugin(name, url = nil)
@@ -87,23 +87,23 @@ private
   def create_plugin_directory(plugin, about = true)
     with_path plugins_path do
       FileUtils.mkdir(plugin) unless File.exists?(plugin)
-      File.open(File.join(plugin, 'about.yml'), 'w+') do |f|
+      File.open([ plugin, 'about.yml' ].to_path, 'w+') do |f|
         f.write({'summary' => "Plugin summary"}.to_yaml)
       end if about
     end
   end
 
   def create_rails_app
-    FileUtils.mkdir_p(File.join(rails_app_path, 'vendor', 'plugins'))
+    FileUtils.mkdir_p [ rails_app_path, 'vendor', 'plugins' ].to_path
   end
 
   def prepare_installation
-    FileUtils.mkdir_p(plugins_path)
+    FileUtils.mkdir_p plugins_path
   end
 
   def create_cache_file
     with_path plugins_path do
-      File.open(cache_file, 'w+'){|f| f.write(cached_plugins.to_yaml)}
+      File.open(cache_file, 'w+'){|f| f.write cached_plugins.to_yaml }
     end
   end
   
