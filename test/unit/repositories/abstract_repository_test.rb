@@ -20,6 +20,22 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     assert_equal cached_plugins.keys.sort, repository.class.plugins_names
   end
   
+  ### INSTANTIATE
+  
+  def test_instantiate_repository
+    assert_kind_of GitRepository, repository.class.instantiate_repository(plugin)
+    assert_kind_of GitRepository, repository.class.instantiate_repository(create_plugin('sashimi', plugin.url))
+  end
+  
+  def test_should_instantiate_repository_by_url
+    assert_equal SvnRepository, AbstractRepository.instantiate_repository_by_url(create_plugin(nil, 'http://svn.com'))
+    assert_equal GitRepository, AbstractRepository.instantiate_repository_by_url(plugin)
+  end
+  
+  def test_should_instantiate_repository_by_cache
+    assert repository.class.instantiate_repository_by_cache(create_plugin('sashimi', plugin.url))
+  end
+  
   ### COMMANDS
   
   # ADD
@@ -109,6 +125,18 @@ class AbstractRepositoryTest < Test::Unit::TestCase
       expected = [ repository.class.find_home, repository.class.plugins_path ].to_path
       assert_equal expected, repository.local_repository_path
     end
+    
+    def test_find_home
+      flunk
+    end
+    
+    def test_with_path
+      old_path = Dir.pwd
+      repository.with_path 'test' do
+        assert_equal [old_path, 'test'].to_path, Dir.pwd
+      end
+      assert_equal old_path, Dir.pwd
+    end
   end
   
   def test_path_to_rails_app
@@ -131,5 +159,93 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   def test_plugin_path
     expected = [ plugins_path, repository.plugin.name ].to_path
     assert_equal expected, repository.plugin_path
+  end
+  
+  ### FILES
+  
+  def test_copy_plugin_and_remove_hidden_folders
+    flunk
+  end
+    
+  def test_update_rails_plugins
+    flunk
+  end
+  
+  def test_update_unversioned_rails_plugins
+    flunk
+  end
+  
+  def test_update_versioned_rails_plugins
+    flunk
+  end
+  
+  def test_files_scheduled_for_add
+    flunk
+  end
+  
+  def test_files_scheduled_for_remove
+    flunk
+  end
+  
+  def test_remove_temp_folder
+    flunk
+  end
+  
+  def test_prepare_installation
+    flunk
+  end
+  
+  def test_copy_plugin_to_rails_app
+    flunk
+  end
+  
+  def test_remove_hidden_folders
+    flunk
+  end
+  
+  ### CACHE
+  
+  def test_cache_content
+    assert_equal cached_plugins, repository.class.cache_content
+  end
+  
+  def test_should_add_a_new_plugin_to_cache
+    with_clear_cache do
+      create_plugin_directory('brand_new')
+      plugin = create_plugin(nil, 'git://github.com/jodosha/brand_new.git')
+      repository.add_to_cache(plugin)
+      assert_equal cached_plugins.merge(plugin.to_hash), repository.class.cache_content
+    end
+  end
+  
+  def test_should_merge_an_existent_plugin_into_cache
+    with_clear_cache do
+      repository.add_to_cache(plugin)
+      assert_equal cached_plugins.merge(plugin.to_hash), repository.class.cache_content
+    end
+  end
+  
+  def test_remove_from_cache
+    with_clear_cache do
+      repository.remove_from_cache
+      assert_not repository.class.plugins_names.include?(plugin.name)
+    end
+  end
+  
+  def test_write_to_cache
+    with_clear_cache do
+      repository.write_to_cache(plugin.to_hash)
+      assert_equal plugin.to_hash, repository.class.cache_content
+    end
+  end
+  
+  ### OTHER
+  
+  def test_about
+    flunk
+  end
+  
+  def test_run_install_hook
+    flunk
   end
 end

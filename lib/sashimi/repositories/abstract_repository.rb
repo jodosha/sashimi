@@ -5,7 +5,7 @@ module Sashimi
     end
 
     def to_s
-      @message || @plugin_name + " isn't in the local repository."
+      @message || @plugin_name.to_s + " isn't in the local repository."
     end
   end
   
@@ -46,13 +46,11 @@ module Sashimi
 
     class << self
       def instantiate_repository(plugin)
-        with_path local_repository_path do
-          unless plugin.name.nil?
-            instantiate_repository_by_cache(plugin)
-          else
-            instantiate_repository_by_url(plugin)
-          end.new(plugin)
-        end
+        unless plugin.name.nil?
+          instantiate_repository_by_cache(plugin)
+        else
+          instantiate_repository_by_url(plugin)
+        end.new(plugin)
       end
 
       # Return all installed plugin names and summary, formatted for stdout.
@@ -275,9 +273,9 @@ module Sashimi
     # Write all the plugins into the cache
     def write_to_cache(plugins)
       with_path local_repository_path do
-        FileUtils.mv(cache_file, "#{cache_file}-backup")
-        File.open(cache_file, 'w'){|f| f.write(plugins.to_yaml)}
-        FileUtils.rm("#{cache_file}-backup")
+        File.atomic_write(cache_file) do |file|
+          file.write(plugins.to_yaml)
+        end
       end
     end
     

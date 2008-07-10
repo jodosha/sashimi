@@ -85,10 +85,12 @@ private
   end
 
   def create_plugin_directory(plugin, about = true)
-    FileUtils.mkdir(plugin) unless File.exists?(plugin)
-    File.open(File.join(plugin, 'about.yml'), 'w+') do |f|
-      f.write({'summary' => "Plugin summary"}.to_yaml)
-    end if about
+    with_path plugins_path do
+      FileUtils.mkdir(plugin) unless File.exists?(plugin)
+      File.open(File.join(plugin, 'about.yml'), 'w+') do |f|
+        f.write({'summary' => "Plugin summary"}.to_yaml)
+      end if about
+    end
   end
 
   def create_rails_app
@@ -100,7 +102,9 @@ private
   end
 
   def create_cache_file
-    File.open(cache_file, 'w+'){|f| f.write(cached_plugins.to_yaml)}
+    with_path plugins_path do
+      File.open(cache_file, 'w+'){|f| f.write(cached_plugins.to_yaml)}
+    end
   end
   
   def with_local_repository_path(&block)
@@ -117,12 +121,24 @@ private
       FileUtils.cd(old_path)
     end
   end
+  
+  def with_clear_cache(&block)
+    AbstractRepository.expire_cache
+    yield
+    create_cache_file
+    AbstractRepository.expire_cache
+  end
 end
 
 module Sashimi
   class AbstractRepository
     @@plugins_path = 'sashimi_test/.rails/plugins'
     cattr_accessor :plugins_path
+
+    def self.expire_cache #:nodoc:
+      @@cache_content = nil
+    end
+
     public :add_to_cache, :cache_content, :cache_file,
       :copy_plugin_to_rails_app, :local_repository_path, :path_to_rails_app,
       :prepare_installation, :remove_from_cache, :rails_plugins_path,
