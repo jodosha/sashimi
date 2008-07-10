@@ -13,6 +13,11 @@ class Test::Unit::TestCase
   def assert_path_exists(path)
     assert File.exists?(path.to_path)
   end
+
+  # Asserts the given path doesn't exists
+  def assert_path_not_exists(path)
+    assert !File.exists?(path.to_path)
+  end
   
 private
   def create_test_repository

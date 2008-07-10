@@ -4,15 +4,15 @@ require 'test/test_helper'
 class AbstractRepositoryTest < Test::Unit::TestCase
   include Sashimi
   
-  def _test_initialize
+  def test_initialize
     assert repository.plugin
   end
   
-  def _test_plugins_path
+  def test_plugins_path
     assert_equal 'sashimi_test/.rails/plugins', repository.class.plugins_path
   end
   
-  def _test_cache_file
+  def test_cache_file
     assert_equal cache_file, repository.class.cache_file
   end
   
@@ -26,11 +26,26 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     end
   end
   
-  def test_should_raise_exception_on_missing_plugin
+  def test_should_raise_exception_on_adding_missing_plugin
     with_path rails_app_path do
       assert_raise PluginNotFound do
         create_repository('unexistent').add
       end
+    end
+  end
+  
+  # UNINSTALL
+  def test_should_uninstall_plugin_from_repository
+    repository.uninstall
+    with_path plugins_path do
+      assert_path_not_exists repository.plugin.name
+    end
+    assert_not repository.class.plugins_names.include?(repository.plugin.name)
+  end
+  
+  def test_should_raise_exception_on_uninstalling_missing_plugin
+    assert_raise PluginNotFound do
+      create_repository('unexistent').uninstall
     end
   end
 end
