@@ -143,7 +143,7 @@ module Sashimi
       :copy_plugin_to_rails_app, :local_repository_path, :path_to_rails_app,
       :prepare_installation, :remove_from_cache, :rails_plugins_path,
       :remove_hidden_folders, :rename_temp_folder, :run_install_hook,
-      :write_to_cache, :with_path, :plugin_path
+      :write_to_cache, :with_path, :plugin_path, :temp_plugin_name
   end
 end
 

@@ -10,6 +10,7 @@ module Sashimi
   end
   
   class AbstractRepository
+    TEMP_SUFFIX = '-tmp'
     @@plugins_path = ".rails/plugins".to_path
     @@cache_file = '.plugins'
     cattr_accessor :cache_file
@@ -95,7 +96,7 @@ module Sashimi
           repository.copy_plugin_and_remove_hidden_folders
           files_scheduled_for_remove = repository.files_scheduled_for_remove
           files_scheduled_for_add    = repository.files_scheduled_for_add
-          FileUtils.cp_r(plugin_name+'-tmp/.', plugin_name)
+          FileUtils.cp_r(temp_plugin_name+'/.', plugin_name)
           repository.remove_temp_folder
           change_dir(plugin_name)
           files_scheduled_for_remove.each {|file| scm_remove file}
@@ -221,7 +222,7 @@ module Sashimi
     # Returns a list of files that should be scheduled for SCM add.
     def files_scheduled_for_add
       with_path absolute_rails_plugins_path do
-        Dir[plugin.name+"-tmp/**/*"].collect {|fn| fn.gsub(plugin.name+'-tmp', '.')} -
+        Dir[temp_plugin_name+"/**/*"].collect {|fn| fn.gsub(temp_plugin_name, '.')} -
           Dir[plugin.name+"/**/*"].collect{|fn| fn.gsub(plugin.name, '.')}
       end
     end
@@ -230,14 +231,14 @@ module Sashimi
     def files_scheduled_for_remove
       with_path absolute_rails_plugins_path do
         Dir[plugin.name+"/**/*"].collect {|fn| fn.gsub(plugin.name, '.')} -
-          Dir[plugin.name+"-tmp/**/*"].collect {|fn| fn.gsub(plugin.name+"-tmp", '.')}
+          Dir[temp_plugin_name+"/**/*"].collect {|fn| fn.gsub(temp_plugin_name, '.')}
       end
     end
     
     # Remove the temp folder, used by update process.
     def remove_temp_folder
       with_path absolute_rails_plugins_path do
-        FileUtils.rm_rf(plugin.name+'-tmp')
+        FileUtils.rm_rf temp_plugin_name
       end
     end
     
@@ -283,7 +284,7 @@ module Sashimi
     def copy_plugin_to_rails_app
       FileUtils.mkdir_p(plugins_path)
       FileUtils.cp_r [ local_repository_path, plugin.name ].to_path,
-        [ rails_plugins_path, plugin.name+'-tmp'].to_path
+        [ rails_plugins_path, temp_plugin_name ].to_path
     end
     
     # Rename the *-tmp folder used by the installation process.
@@ -291,14 +292,14 @@ module Sashimi
     # Example:
     #   click-to-globalize-tmp # => click-to-globalize
     def rename_temp_folder
-      FileUtils.mv [ rails_plugins_path, plugin.name+'-tmp' ].to_path,
+      FileUtils.mv [ rails_plugins_path, temp_plugin_name ].to_path,
         [ rails_plugins_path, plugin.name ].to_path
     end
     
     # Remove SCM hidden folders.
     def remove_hidden_folders
       require 'find'
-      with_path [ absolute_rails_plugins_path, plugin.name + '-tmp' ].to_path do
+      with_path [ absolute_rails_plugins_path, temp_plugin_name ].to_path do
         Find.find('./') do |path|
           if File.basename(path) == '.'+scm_type
             FileUtils.remove_dir(path, true)
@@ -306,6 +307,11 @@ module Sashimi
           end
         end
       end
+    end
+    
+    # Returns the name used for temporary plugin folder.
+    def temp_plugin_name
+      plugin.name + TEMP_SUFFIX
     end
     
     # Run the plugin install hook.

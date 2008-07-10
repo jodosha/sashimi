@@ -20,6 +20,10 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     assert_equal cached_plugins.keys.sort, repository.class.plugins_names
   end
   
+  def test_temp_suffix
+    assert_equal '-tmp', AbstractRepository::TEMP_SUFFIX
+  end
+  
   ### INSTANTIATE
   
   def test_instantiate_repository
@@ -243,6 +247,11 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   
   def test_about
     flunk
+  end
+
+  def test_temp_plugin_name
+    assert_equal repository.plugin.name + AbstractRepository::TEMP_SUFFIX,
+      repository.temp_plugin_name
   end
   
   def test_run_install_hook
