@@ -1,3 +1,4 @@
+$:.unshift 'lib'
 require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
@@ -19,4 +20,13 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.options << '--line-numbers' << '--inline-source'
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+desc 'Build and install the gem (useful for development purposes).'
+task :install do
+  require 'sashimi'
+  system "rm sashimi-*.gem"
+  system "gem build sashimi.gemspec"
+  system "sudo gem uninstall sashimi"
+  system "sudo gem install --local sashimi-#{Sashimi::VERSION::STRING}.gem"
 end
