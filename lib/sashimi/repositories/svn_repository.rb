@@ -3,8 +3,10 @@ module Sashimi
     def install
       prepare_installation
       puts plugin.guess_name.titleize + "\n\n"
-      Kernel.system("svn co #{plugin.url} #{plugin.guess_name}")
-      add_to_cache(plugin.to_hash)
+      with_path local_repository_path do
+        Kernel.system("svn co #{plugin.url} #{plugin.guess_name}")
+        add_to_cache(plugin.to_hash)
+      end
     end
     
     def update

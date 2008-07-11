@@ -89,18 +89,20 @@ module Sashimi
 
       # Update the plugins installed in a versioned rails app.
       def update_versioned_rails_plugins(plugins_names)
-        change_dir(plugins_dir)
-        plugins_names.each do |plugin_name|
-          raise PluginNotFound.new(plugin_name) unless File.exists?(plugin_name)
-          repository = Plugin.new(plugin_name).repository
-          repository.copy_plugin_and_remove_hidden_folders
-          files_scheduled_for_remove = repository.files_scheduled_for_remove
-          files_scheduled_for_add    = repository.files_scheduled_for_add
-          FileUtils.cp_r(temp_plugin_name+'/.', plugin_name)
-          repository.remove_temp_folder
-          change_dir(plugin_name)
-          files_scheduled_for_remove.each {|file| scm_remove file}
-          files_scheduled_for_add.each {|file| scm_add file}
+        with_path absolute_rails_plugins_path do
+          plugins_names.each do |plugin_name|
+            raise PluginNotFound.new(plugin_name) unless File.exists?(plugin_name)
+            repository = Plugin.new(plugin_name).repository
+            repository.copy_plugin_and_remove_hidden_folders
+            files_scheduled_for_remove = repository.files_scheduled_for_remove
+            files_scheduled_for_add    = repository.files_scheduled_for_add
+            FileUtils.cp_r(repository.temp_plugin_name+'/.', plugin_name)
+            repository.remove_temp_folder
+            with_path plugin_name do
+              files_scheduled_for_remove.each {|file| scm_remove file}
+              files_scheduled_for_add.each {|file| scm_add file}
+            end
+          end
         end
       end
 
@@ -241,6 +243,11 @@ module Sashimi
       end
     end
     
+    # Returns the name used for temporary plugin folder.
+    def temp_plugin_name
+      plugin.name + TEMP_SUFFIX
+    end
+
     class_method_proxy :local_repository_path, :cache_file,
       :cache_content, :path_to_rails_app, :rails_plugins_path,
       :with_path, :absolute_rails_plugins_path
@@ -309,12 +316,7 @@ module Sashimi
         end
       end
     end
-    
-    # Returns the name used for temporary plugin folder.
-    def temp_plugin_name
-      plugin.name + TEMP_SUFFIX
-    end
-    
+
     # Run the plugin install hook.
     def run_install_hook
       install_hook_file = [ rails_plugins_path, plugin.name, 'install.rb' ].to_path
