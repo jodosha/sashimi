@@ -124,7 +124,7 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   
   uses_mocha 'AbstractRepositoryTestPath' do
     def test_local_repository_path
-      AbstractRepository.stubs(:find_home).returns '/Users/luca'
+      AbstractRepository.expects(:find_home).returns '/Users/luca'
       File.stubs(:SEPARATOR).returns '/'
       expected = [ repository.class.find_home, repository.class.plugins_path ].to_path
       assert_equal expected, repository.local_repository_path
@@ -166,44 +166,68 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   end
   
   ### FILES
-  
-  def test_copy_plugin_and_remove_hidden_folders
-    flunk
-  end
     
-  def test_update_rails_plugins
-    flunk
+  uses_mocha 'AbstractRepositoryTestFile' do
+    def _ignore_test_copy_plugin_and_remove_hidden_folders
+      flunk
+    end
+
+    def test_update_rails_plugins
+      AbstractRepository.expects(:under_version_control?).returns true
+      AbstractRepository.expects(:update_versioned_rails_plugins)
+      AbstractRepository.update_rails_plugins plugin.name
+
+      AbstractRepository.expects(:under_version_control?).returns false
+      AbstractRepository.expects(:update_unversioned_rails_plugins)
+      AbstractRepository.update_rails_plugins plugin.name
+    end
+
+    def _ignore_test_update_unversioned_rails_plugins
+      FileUtils.stubs(:rm_rf) # because of teardown
+      FileUtils.expects(:rm_rf).with 'sashimi'
+      FileUtils.stubs(:cd)
+      AbstractRepository.expects(:instantiate_repository_by_cache).returns GitRepository
+      GitRepository.stubs(:cache_content).returns({ 'sashimi' => nil })
+      Plugin.expects(:add)
+      FileUtils.expects(:cp_r).with [ plugins_path, repository.plugin.name ].to_path,
+        [ repository.class.rails_plugins_path, repository.temp_plugin_name ].to_path
+      FileUtils.expects(:mv).with [ repository.rails_plugins_path, repository.temp_plugin_name ].to_path,
+        [ repository.rails_plugins_path, repository.plugin.name ].to_path
+
+      AbstractRepository.update_unversioned_rails_plugins 'sashimi'
+    end
+
+    def _ignore_test_update_versioned_rails_plugins
+      flunk
+    end
+
+    def test_files_scheduled_for_add
+      flunk
+    end
+
+    def test_files_scheduled_for_remove
+      flunk
+    end
+
+    def test_remove_temp_folder
+      FileUtils.expects(:rm_rf).with repository.temp_plugin_name
+      repository.remove_temp_folder
+      FileUtils.stubs(:rm_rf) # because of teardown
+    end
+
+    def test_prepare_installation
+      FileUtils.expects(:touch).with cache_file
+      repository.prepare_installation
+    end
+
+    def test_copy_plugin_to_rails_app
+      FileUtils.expects(:cp_r).with [ repository.local_repository_path, repository.plugin.name ].to_path,
+        [ repository.rails_plugins_path, repository.temp_plugin_name ].to_path
+      repository.copy_plugin_to_rails_app
+    end
   end
-  
-  def test_update_unversioned_rails_plugins
-    flunk
-  end
-  
-  def test_update_versioned_rails_plugins
-    flunk
-  end
-  
-  def test_files_scheduled_for_add
-    flunk
-  end
-  
-  def test_files_scheduled_for_remove
-    flunk
-  end
-  
-  def test_remove_temp_folder
-    flunk
-  end
-  
-  def test_prepare_installation
-    flunk
-  end
-  
-  def test_copy_plugin_to_rails_app
-    flunk
-  end
-  
-  def test_remove_hidden_folders
+
+  def _ignore_test_remove_hidden_folders
     flunk
   end
   
@@ -245,8 +269,14 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   
   ### OTHER
   
-  def test_about
-    flunk
+  def test_should_load_about_yml
+    assert_not_empty repository.about.keys
+  end
+
+  def test_should_return_empty_hash_for_unexistent_about_yml
+    assert_nothing_raised Exception do
+      assert_empty create_repository('plug-in').about.keys
+    end
   end
 
   def test_temp_plugin_name
@@ -254,7 +284,18 @@ class AbstractRepositoryTest < Test::Unit::TestCase
       repository.temp_plugin_name
   end
   
-  def test_run_install_hook
-    flunk
+  uses_mocha 'AbstractRepositoryTestOther' do
+    def test_should_run_install_hook
+      File.expects(:exists?).returns true
+      Kernel.expects(:load)
+      repository.run_install_hook
+    end
+
+    def test_should_not_raise_exception_running_install_hook_with_missing_file
+      assert_nothing_raised Exception do
+        Kernel.expects(:load).never
+        create_repository('plug-in').run_install_hook
+      end
+    end
   end
 end

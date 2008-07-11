@@ -4,19 +4,30 @@ require 'sashimi'
 class Test::Unit::TestCase
   include Sashimi
   
+  # Asserts the given condition is false.
   def assert_not(condition, message = nil)
     assert !condition, message
   end
   
+  # Asserts the given collection is empty.
+  def assert_empty(collection, message = nil)
+    assert collection.empty?, message
+  end
+  
+  # Asserts the given collection is *not* empty.
+  def assert_not_empty(collection, message = nil)
+    assert !collection.empty?, message
+  end
+  
   # Asserts the given path exists
   # It accepts path/to/be/asserted and automatically make it cross platform.
-  def assert_path_exists(path)
-    assert File.exists?(path.to_path)
+  def assert_path_exists(path, message = nil)
+    assert File.exists?(path.to_path), message
   end
 
   # Asserts the given path doesn't exists
-  def assert_path_not_exists(path)
-    assert !File.exists?(path.to_path)
+  def assert_path_not_exists(path, message = nil)
+    assert !File.exists?(path.to_path), message
   end
   
 private
@@ -103,7 +114,7 @@ private
 
   def create_cache_file
     with_path plugins_path do
-      File.open(cache_file, 'w+'){|f| f.write cached_plugins.to_yaml }
+      File.open(cache_file, 'w+'){ |f| f.write cached_plugins.to_yaml }
     end
   end
   

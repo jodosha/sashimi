@@ -81,7 +81,7 @@ module Sashimi
       def update_unversioned_rails_plugins(plugins_names)
         with_path rails_plugins_path do
           plugins_names.each do |plugin_name|
-            FileUtils.rm_rf(plugin_name)
+            FileUtils.rm_rf plugin_name
             Plugin.new(plugin_name).add
           end
         end
@@ -214,8 +214,7 @@ module Sashimi
     # New feature of Rails 2.1.x http:://dev.rubyonrails.org/changeset/9098
     def about
       with_path plugin_path do
-        return {} unless File.exists?('about.yml')
-        (YAML::load_file('about.yml') || {}).to_hash
+        (YAML::load_file('about.yml') rescue {}).to_hash
       end
     end
 
@@ -254,9 +253,9 @@ module Sashimi
 
     # Prepare the plugin installation
     def prepare_installation
-      FileUtils.mkdir_p(local_repository_path)
+      FileUtils.mkdir_p local_repository_path
       with_path local_repository_path do
-        FileUtils.touch(cache_file)
+        FileUtils.touch cache_file
       end
     end
     
@@ -282,9 +281,11 @@ module Sashimi
     
     # Copy a plugin to a Rails app.
     def copy_plugin_to_rails_app
-      FileUtils.mkdir_p(plugins_path)
-      FileUtils.cp_r [ local_repository_path, plugin.name ].to_path,
-        [ rails_plugins_path, temp_plugin_name ].to_path
+      with_path path_to_rails_app do
+        FileUtils.mkdir_p rails_plugins_path
+        FileUtils.cp_r [ local_repository_path, plugin.name ].to_path,
+          [ rails_plugins_path, temp_plugin_name ].to_path
+      end
     end
     
     # Rename the *-tmp folder used by the installation process.
@@ -317,7 +318,7 @@ module Sashimi
     # Run the plugin install hook.
     def run_install_hook
       install_hook_file = [ rails_plugins_path, plugin.name, 'install.rb' ].to_path
-      load install_hook_file if File.exist? install_hook_file
+      Kernel.load install_hook_file if File.exists? install_hook_file
     end
   end
 end
