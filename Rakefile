@@ -28,5 +28,5 @@ task :install do
   system "rm sashimi-*.gem"
   system "gem build sashimi.gemspec"
   system "sudo gem uninstall sashimi"
-  system "sudo gem install --local sashimi-#{Sashimi::VERSION::STRING}.gem"
+  system "sudo gem install --local --no-rdoc --no-ri sashimi-#{Sashimi::VERSION::STRING}.gem"
 end
