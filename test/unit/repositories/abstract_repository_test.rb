@@ -221,8 +221,9 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     end
 
     def test_copy_plugin_to_rails_app
+      FileUtils.expects(:mkdir_p).with repository.absolute_rails_plugins_path
       FileUtils.expects(:cp_r).with [ repository.local_repository_path, repository.plugin.name ].to_path,
-        [ repository.rails_plugins_path, repository.temp_plugin_name ].to_path
+        [ repository.absolute_rails_plugins_path, repository.temp_plugin_name ].to_path
       repository.copy_plugin_to_rails_app
     end
   end

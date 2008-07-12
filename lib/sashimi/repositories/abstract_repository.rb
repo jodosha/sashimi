@@ -286,11 +286,9 @@ module Sashimi
     
     # Copy a plugin to a Rails app.
     def copy_plugin_to_rails_app
-      with_path path_to_rails_app do
-        FileUtils.mkdir_p rails_plugins_path
-        FileUtils.cp_r [ local_repository_path, plugin.name ].to_path,
-          [ rails_plugins_path, temp_plugin_name ].to_path
-      end
+      FileUtils.mkdir_p absolute_rails_plugins_path
+      FileUtils.cp_r [ local_repository_path, plugin.name ].to_path,
+        [ absolute_rails_plugins_path, temp_plugin_name ].to_path
     end
     
     # Rename the *-tmp folder used by the installation process.
