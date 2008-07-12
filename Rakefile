@@ -25,7 +25,6 @@ end
 desc 'Build and install the gem (useful for development purposes).'
 task :install do
   require 'sashimi'
-  system "rm sashimi-*.gem"
   system "gem build sashimi.gemspec"
   system "sudo gem uninstall sashimi"
   system "sudo gem install --local --no-rdoc --no-ri sashimi-#{Sashimi::VERSION::STRING}.gem"
