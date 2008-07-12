@@ -223,6 +223,7 @@ module Sashimi
     end
     
     # Read the content of the <tt>about.yml</tt>.
+    #
     # New feature of Rails 2.1.0 http://github.com/rails/rails/commit/f5b991d76dc5d21f1870da067fb3101440256fba
     def about
       with_path plugin_path do

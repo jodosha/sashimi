@@ -1,82 +1,80 @@
-Sashimi
-=======
+= Sashimi
 
 Sashimi is a Rails plugins manager.
+
 It allows to install your favourite plugins in a local repository and add them to your Rails apps.
 The main goal is to allow the plugins offline installation.
 
 
 
-Installation
-============
+= Installation
 
-$ (sudo) gem install sashimi
+  $ (sudo) gem install sashimi
 
 or
 
-$ (sudo) gem install jodosha-sashimi --source=http://gems.github.com
+  $ (sudo) gem install jodosha-sashimi --source=http://gems.github.com
 
 
 
-Usage
-=====
+= Usage
 
 Install a plugin from a subversion URL:
-$ sashimi install http://dev.rubyonrails.com/svn/rails/plugins/continuous_builder
+  $ sashimi install http://dev.rubyonrails.com/svn/rails/plugins/continuous_builder
 
 Install a plugin from a git URL:
-$ sashimi install git://github.com/jodosha/click-to-globalize.git
+  $ sashimi install git://github.com/jodosha/click-to-globalize.git
 
 Uninstall a plugin:
-$ sashimi uninstall continuous_builder
+  $ sashimi uninstall continuous_builder
 
 Update a plugin:
-$ sashimi update click-to-globalize
+  $ sashimi update click-to-globalize
 
 Update a plugin of a Rails app:
-$ sashimi update --rails click-to-globalize
+  $ sashimi update --rails click-to-globalize
 
 NOTE: If your application is versioned with Svn or Git, Sashimi will automatically schedules for add/remove the added/removed files.
 
 List all installed plugins:
-$ sashimi list
+  $ sashimi list
 
 Add installed plugin(s) to a Rails app:
-$ sashimi add click-to-globalize
-$ sashimi install --rails click-to-globalize
+  $ sashimi add click-to-globalize
+or
+  $ sashimi install --rails click-to-globalize
 
 
 
-Known And Common Issues
-=======================
+= Known And Common Issues
 
 * When add a plugin to an app, make sure your current directory is the rails root.
 
 * Only Subversion and Git repositories are currently supported.
 
 
-Contribute
-==========
+= Contribute
 
 * Check out the code and test it:
+
   $ git clone git://github.com/jodosha/sashimi.git
+  
   $ rake
 
-* Create a ticket to: http://sushistar.lighthouseapp.com
+* Create a ticket to the {Sushistar Lighthouse page}[http://sushistar.lighthouseapp.com]
 
 * Create a patch and add as attachement to the ticket.
 
 
-Credits
-=======
+= Credits
 
 Partially inspired to RaPT[http://rapt.rubyforge.org/].
 
 
 
-Home Page
-=========
-http://lucaguidi.com/pages/sashimi
+= Home Page
+
+The Sashimi homepage is http://lucaguidi.com/pages/sashimi
 
 
 

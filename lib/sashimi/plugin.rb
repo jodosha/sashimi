@@ -30,9 +30,8 @@ module Sashimi
     def repository #:nodoc:
       @repository ||= instantiate_repository
     end
-    
-    # Read the content of the <tt>about.yml</tt>.
-    # New feature of Rails 2.1.x http:://dev.rubyonrails.org/changeset/9098
+
+    # Returns the informations about the plugin.
     def about
       @about ||= repository.about
     end
@@ -52,7 +51,7 @@ module Sashimi
       name
     end
     
-    # Serialize the plugin to Hash format.
+    # Serialize the plugin to +Hash+ format.
     def to_hash
       { self.guess_name => 
         { 'type' => repository.scm_type,
