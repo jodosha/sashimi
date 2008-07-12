@@ -68,12 +68,10 @@ module Sashimi
 
       # Update the plugins installed in a rails app.
       def update_rails_plugins(plugins_names)
-        with_path path_to_rails_app do
-          if under_version_control?
-            update_versioned_rails_plugins(plugins_names)
-          else
-            update_unversioned_rails_plugins(plugins_names)
-          end
+        if under_version_control?
+          update_versioned_rails_plugins(plugins_names)
+        else
+          update_unversioned_rails_plugins(plugins_names)
         end
       end
 
