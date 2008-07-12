@@ -218,18 +218,14 @@ module Sashimi
 
     # Returns a list of files that should be scheduled for SCM add.
     def files_scheduled_for_add
-      with_path absolute_rails_plugins_path do
-        Dir[temp_plugin_name+"/**/*"].collect {|fn| fn.gsub(temp_plugin_name, '.')} -
-          Dir[plugin.name+"/**/*"].collect{|fn| fn.gsub(plugin.name, '.')}
-      end
+      Dir[temp_plugin_name+"/**/*"].collect {|fn| fn.gsub(temp_plugin_name, '.')} -
+        Dir[plugin.name+"/**/*"].collect{|fn| fn.gsub(plugin.name, '.')}
     end
     
     # Returns a list of files that should be scheduled for SCM remove.
     def files_scheduled_for_remove
-      with_path absolute_rails_plugins_path do
-        Dir[plugin.name+"/**/*"].collect {|fn| fn.gsub(plugin.name, '.')} -
-          Dir[temp_plugin_name+"/**/*"].collect {|fn| fn.gsub(temp_plugin_name, '.')}
-      end
+      Dir[plugin.name+"/**/*"].collect {|fn| fn.gsub(plugin.name, '.')} -
+        Dir[temp_plugin_name+"/**/*"].collect {|fn| fn.gsub(temp_plugin_name, '.')}
     end
     
     # Remove the temp folder, used by update process.
