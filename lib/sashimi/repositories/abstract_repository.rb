@@ -255,9 +255,7 @@ module Sashimi
     # Prepare the plugin installation
     def prepare_installation
       FileUtils.mkdir_p local_repository_path
-      with_path local_repository_path do
-        FileUtils.touch cache_file
-      end
+      FileUtils.touch [ local_repository_path, cache_file ].to_path
     end
     
     # Add a plugin into the cache

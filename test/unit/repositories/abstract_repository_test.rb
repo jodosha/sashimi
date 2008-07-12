@@ -219,7 +219,8 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     end
 
     def test_prepare_installation
-      FileUtils.expects(:touch).with cache_file
+      FileUtils.expects(:mkdir_p).with repository.local_repository_path
+      FileUtils.expects(:touch).with [ repository.local_repository_path, cache_file ].to_path
       repository.prepare_installation
     end
 
