@@ -279,10 +279,8 @@ module Sashimi
 
     # Write all the plugins into the cache
     def write_to_cache(plugins)
-      with_path local_repository_path do
-        File.atomic_write(cache_file) do |file|
-          file.write(plugins.to_yaml)
-        end
+      File.atomic_write(cache_file) do |file|
+        file.write(plugins.to_yaml)
       end
     end
     
