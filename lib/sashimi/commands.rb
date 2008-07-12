@@ -179,7 +179,10 @@ module Sashimi
       
       def parse!(args)
         options.parse!(args)
-        puts Plugin.list
+        output = Plugin.list.sort.collect do |plugin, contents|
+          "#{plugin}\t\t#{contents['summary']}"
+        end.join("\n")
+        puts output
       end
     end
 

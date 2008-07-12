@@ -74,9 +74,8 @@ class AbstractRepositoryTest < Test::Unit::TestCase
   end
   
   # LIST
-  # TODO cleanup
   def test_should_list_installed_plugins
-    assert_equal "plug-in\t\t\nplugin\t\t\nsashimi\t\t", repository.class.list
+    assert_equal cached_plugins, repository.class.list
   end
     
   ### SCM

@@ -54,13 +54,6 @@ module Sashimi
         end.new(plugin)
       end
 
-      # Return all installed plugin names and summary, formatted for stdout.
-      def list
-        cache_content.sort.collect do |plugin, contents|
-          "#{plugin}\t\t#{contents['summary']}"
-        end.join("\n")
-      end
-
       # Return all installed plugins names.
       def plugins_names
         cache_content.keys.sort
@@ -132,6 +125,7 @@ module Sashimi
           @@cache_content ||= (YAML::load_file(cache_file) || {}).to_hash
         end
       end
+      alias_method :list, :cache_content
 
       def instantiate_repository_by_url(plugin)
         git_url?(plugin.url) ? GitRepository : SvnRepository
