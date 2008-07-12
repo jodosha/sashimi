@@ -122,10 +122,9 @@ private
     with_path(local_repository_path, &block)
   end
   
-  # FIXME why often Dir.pwd returns nil ?
   def with_path(path, &block)
     begin
-      old_path = Dir.pwd rescue plugins_path
+      old_path = Dir.pwd
       FileUtils.cd(path)
       yield
     ensure
