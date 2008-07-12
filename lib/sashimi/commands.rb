@@ -125,6 +125,7 @@ module Sashimi
       def parse!(args)
         options.parse!(args)
         args.each do |name|
+          puts name.titleize + "\n"
           Plugin.new(name).uninstall
         end
       end
