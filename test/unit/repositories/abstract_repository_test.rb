@@ -210,9 +210,12 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     end
 
     def test_remove_temp_folder
-      FileUtils.expects(:rm_rf).with repository.temp_plugin_name
-      repository.remove_temp_folder
-      FileUtils.stubs(:rm_rf) # because of teardown
+      with_path rails_app_path do
+        FileUtils.expects(:rm_rf).with [ repository.absolute_rails_plugins_path,
+          repository.temp_plugin_name].to_path
+        repository.remove_temp_folder
+        FileUtils.stubs(:rm_rf) # because of teardown
+      end
     end
 
     def test_prepare_installation

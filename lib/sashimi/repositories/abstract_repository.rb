@@ -234,9 +234,7 @@ module Sashimi
     
     # Remove the temp folder, used by update process.
     def remove_temp_folder
-      with_path absolute_rails_plugins_path do
-        FileUtils.rm_rf temp_plugin_name
-      end
+      FileUtils.rm_rf [ absolute_rails_plugins_path, temp_plugin_name ].to_path
     end
     
     # Returns the name used for temporary plugin folder.
