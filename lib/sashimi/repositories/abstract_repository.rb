@@ -77,11 +77,9 @@ module Sashimi
 
       # Update the plugins installed in a non versioned rails app.
       def update_unversioned_rails_plugins(plugins_names)
-        with_path rails_plugins_path do
-          plugins_names.each do |plugin_name|
-            FileUtils.rm_rf plugin_name
-            Plugin.new(plugin_name).add
-          end
+        plugins_names.each do |plugin_name|
+          FileUtils.rm_rf [ absolute_rails_plugins_path, plugin_name ].to_path
+          Plugin.new(plugin_name).add
         end
       end
 
