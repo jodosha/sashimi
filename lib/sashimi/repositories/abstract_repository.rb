@@ -11,7 +11,15 @@ module Sashimi
   
   class AbstractRepository
     TEMP_SUFFIX = '-tmp'
+
+    # It's the path where the plugins are stored.
     @@plugins_path = ".rails/plugins".to_path
+
+    # Conventional path where Rails applications use to place their plugins.
+    @@rails_plugins_path = "vendor/plugins".to_path
+    cattr_reader :rails_plugins_path
+
+    # Cache file used to store informations about installed plugins.
     @@cache_file = '.plugins'
     cattr_accessor :cache_file
     
@@ -21,7 +29,7 @@ module Sashimi
       @plugin = plugin
     end
     
-    # Remove the repository
+    # Uninstall the current plugin.
     def uninstall
       with_path local_repository_path do
         raise PluginNotFound.new(plugin.name) unless File.exists?(plugin.name)
@@ -30,7 +38,7 @@ module Sashimi
       end
     end
     
-    # Add to a Rails app.
+    # Add the current plugin to a Rails app.
     def add
       raise PluginNotFound.new(plugin.name) unless cache_content.keys.include?(plugin.name)
       puts plugin.name.titleize + "\n"
@@ -39,13 +47,17 @@ module Sashimi
       run_install_hook
     end
 
-    # Copy a plugin to a Rails app and remove SCM hidden folders
+    # Copy a plugin to a Rails app and remove SCM hidden folders.
     def copy_plugin_and_remove_hidden_folders
       copy_plugin_to_rails_app
       remove_hidden_folders
     end
 
     class << self
+      # Instantiate a repository (Svn or Git) for the given plugin.
+      #
+      # If the plugin was already installed it load from the cache,
+      # otherwise it try to guess information from its url.
       def instantiate_repository(plugin)
         unless plugin.name.nil?
           instantiate_repository_by_cache(plugin)
@@ -60,6 +72,9 @@ module Sashimi
       end
 
       # Update the plugins installed in a rails app.
+      #
+      # If the application is under version control, +Sashimi+ cares about to
+      # schedule add/remove plugin's files from/to your SCM of choice.
       def update_rails_plugins(plugins_names)
         if under_version_control?
           update_versioned_rails_plugins(plugins_names)
@@ -68,7 +83,7 @@ module Sashimi
         end
       end
 
-      # Update the plugins installed in a non versioned rails app.
+      # Update the plugins installed in a <b>not versioned</b> Rails app.
       def update_unversioned_rails_plugins(plugins_names)
         plugins_names.each do |plugin_name|
           FileUtils.rm_rf [ absolute_rails_plugins_path, plugin_name ].to_path
@@ -76,7 +91,7 @@ module Sashimi
         end
       end
 
-      # Update the plugins installed in a versioned rails app.
+      # Update the plugins installed in a <b>versioned</b> Rails app.
       def update_versioned_rails_plugins(plugins_names)
         with_path absolute_rails_plugins_path do
           plugins_names.each do |plugin_name|
@@ -95,11 +110,12 @@ module Sashimi
         end
       end
 
-      # Schedules an add for the given file on the current SCM system used by the Rails app.
+      # Schedules an <b>add</b> for the given file on the current SCM system used by the Rails app.
       def scm_add(file)
         scm_command(:add, file)
       end
 
+      # Schedules a <b>remove</b> for the given file on the current SCM system used by the Rails app.
       def scm_remove(file)
         scm_command(:rm, file)
       end
@@ -110,11 +126,14 @@ module Sashimi
         Kernel.system("#{scm} #{command} #{file}")
       end
 
+      # It's the absolute path where the plugins are stored.
+      #
+      # Typically, it's under your home directory.
       def local_repository_path #:nodoc:
         @local_repository_path ||= [ find_home, @@plugins_path ].to_path
       end
 
-      # Return the path to the Rails app where the user launched sashimi command.
+      # Return the path to the Rails app where the user launched <tt>sashimi</tt> command.
       def path_to_rails_app
         $rails_app
       end
@@ -127,28 +146,28 @@ module Sashimi
       end
       alias_method :list, :cache_content
 
+      # Istantiate a +Repository+ for the given +plugin+, guessing if its url
+      # refers to a Svn or Git repository.
       def instantiate_repository_by_url(plugin)
         git_url?(plugin.url) ? GitRepository : SvnRepository
       end
 
+      # Instantiate a repository for the given +plugin+, loading informations
+      # from the cache.
       def instantiate_repository_by_cache(plugin)
         cached_plugin = cache_content[plugin.name]
         raise PluginNotFound.new(plugin.name) if cached_plugin.nil?
         cached_plugin['type'] == 'git' ? GitRepository : SvnRepository
       end
             
-      # Change the current directory with the fully qualified
-      # path to Rails app and plugins_dir.
+      # It's absolute path of plugins in your Rails app.
+      #
+      #   path/to/rails_app # => /Users/luca/path/to/rails_app/vendor/plugins
       def absolute_rails_plugins_path
-        @@absolute_rails_plugins_path ||= [ path_to_rails_app,
+        @@absolute_rails_plugins_path = [ path_to_rails_app,
           rails_plugins_path ].to_path(true)
       end
-      
-      # Rails app plugins dir
-      def rails_plugins_path
-        @@rails_plugins_path ||= "vendor/plugins".to_path
-      end
-      
+
       # Check if the current working directory is under version control
       def under_version_control?
         !Dir.glob(".{git,svn}").empty?
@@ -183,6 +202,7 @@ module Sashimi
         url =~ /^git:\/\// || url =~ /\.git$/
       end
       
+      # Yield the given block executing it in the specified path
       def with_path(path, &block)
         begin
           old_path = Dir.pwd
@@ -203,7 +223,7 @@ module Sashimi
     end
     
     # Read the content of the <tt>about.yml</tt>.
-    # New feature of Rails 2.1.x http:://dev.rubyonrails.org/changeset/9098
+    # New feature of Rails 2.1.0 http://github.com/rails/rails/commit/f5b991d76dc5d21f1870da067fb3101440256fba
     def about
       with_path plugin_path do
         (YAML::load_file('about.yml') rescue {}).to_hash
