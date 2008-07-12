@@ -1,3 +1,57 @@
+* Massive changelog
+
+* rdoc formatting
+
+* Using, where possible, @@class_variable and cattr_reader instead of class methods. Documentation improvements.
+
+* Don't try to remove the gem from working copy at the beginning of Rake install
+
+* Print plugin name when execute uninstall command
+
+* Aliased #cache_content with #list in order to clean up AbstractRepository from stdout formattin code. The code was moved to Commands::List
+
+* Clean up for #with_path in test_helper.rb
+
+* Removed with_path from #files_scheduled_for_add and #files_scheduled_for_remove because #update_versioned_rails_plugins already works in vendor/plugins
+
+* Removed unnecessary with_path statement from AbstractRepository#prepare_installation
+
+* Removed unnecessary with_path statement from AbstractRepository#remove_temp_folder
+
+* Removed unnecessary with_path statement from AbstractRepository#update_unversioned_rails_plugins
+
+* Removed with_path from #update_rails_plugins, because update command should be always executed from the root of a Rails app
+
+* Removed unnecessary with_path statement from AbstractRepository#copy_plugin_to_rails_app
+
+* Removed unnecessary with_path statement for AbstractRepository#write_to_cache
+
+* Remove builded gem from working copy, after rake install task
+
+* Don't generate rdoc and ri on Rake install
+
+* Fixed AbstractRepository#update_versioned_rails_plugins. Made AbstractRepository#temp_plugin_name public
+
+* Created install Rake task
+
+* Improved test coverage for AbstractRepository
+
+* Added AbstractRepository#temp_plugin_name
+
+* File#join -> Array#to_path or String#to_path. Code cleanup.
+
+* Improved tests for AbstractRepository cache and instantiation
+
+* Improved test coverage for AbstractRepository
+
+* Added tests for uninstall. Re-enabled tests.
+
+* Initial rewriting of test suite
+
+* Added String#to_path and Array#to_path
+
+* Added AbstractRepository#with_path in order to scopify current directory changes
+
 * Added block support to Class#class_method_proxy
 
 
