@@ -3,6 +3,8 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 
+repositories = %w( origin rubyforge )
+
 desc 'Default: run unit tests.'
 task :default => :test
 
@@ -47,4 +49,24 @@ task :clean do
   system "rm sashimi-#{version}.gem"     if File.exist? "sashimi-#{version}.gem"
   system "rm sashimi-#{version}.tar.gz"  if File.exist? "sashimi-#{version}.tar.gz"
   system "rm sashimi-#{version}.tar.bz2" if File.exist? "sashimi-#{version}.tar.bz2"
+end
+
+namespace :git do
+  desc 'Push local Git commits to all remote centralized repositories.'
+  task :push do
+    repositories.each { |repository| system "git push #{repository} master" }
+  end
+  
+  desc 'Perform a git-tag'
+  task :tag do
+    puts "Please enter the tag name: "
+    tag_name = STDIN.gets.chomp
+    exit(1) if tag_name.nil? or tag_name.empty?
+    system "git tag -s #{tag_name}"
+  end
+  
+  desc 'Push all the tags to remote centralized repositories.'
+  task :push_tags do
+    repositories.each { |repository| system "git push --tags #{repository}" }
+  end
 end
