@@ -30,3 +30,21 @@ task :install do
   system "sudo gem install --local --no-rdoc --no-ri sashimi-#{Sashimi::VERSION::STRING}.gem"
   system "rm sashimi-*.gem"
 end
+
+desc 'Build and prepare files for release.'
+task :dist => :clean do
+  require 'sashimi'
+  system "gem build sashimi.gemspec"
+  system "cd .. && tar -czf sashimi-#{Sashimi::VERSION::STRING}.tar.gz sashimi"
+  system "cd .. && tar -cjf sashimi-#{Sashimi::VERSION::STRING}.tar.bz2 sashimi"
+  system "cd .. && cp sashimi-* sashimi"
+end
+
+desc 'Clean the working copy from release files.'
+task :clean do
+  require 'sashimi'
+  version = Sashimi::VERSION::STRING
+  system "rm sashimi-#{version}.gem"     if File.exist? "sashimi-#{version}.gem"
+  system "rm sashimi-#{version}.tar.gz"  if File.exist? "sashimi-#{version}.tar.gz"
+  system "rm sashimi-#{version}.tar.bz2" if File.exist? "sashimi-#{version}.tar.bz2"
+end
