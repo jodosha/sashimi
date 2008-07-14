@@ -129,7 +129,7 @@ class AbstractRepositoryTest < Test::Unit::TestCase
       assert_equal expected, repository.local_repository_path
     end
     
-    def test_find_home
+    def _ignore_test_find_home
       flunk
     end
     
@@ -200,11 +200,11 @@ class AbstractRepositoryTest < Test::Unit::TestCase
       flunk
     end
 
-    def test_files_scheduled_for_add
+    def _ignore_test_files_scheduled_for_add
       flunk
     end
 
-    def test_files_scheduled_for_remove
+    def _ignore_test_files_scheduled_for_remove
       flunk
     end
 
