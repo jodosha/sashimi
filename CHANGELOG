@@ -1,3 +1,5 @@
+* Print on stdout the name of the remote repository while executing Git Rake tasks
+
 * Created Git related Rake tasks
 
 * Created dist and clean Rake tasks

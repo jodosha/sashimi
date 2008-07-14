@@ -54,7 +54,10 @@ end
 namespace :git do
   desc 'Push local Git commits to all remote centralized repositories.'
   task :push do
-    repositories.each { |repository| system "git push #{repository} master" }
+    repositories.each do |repository|
+      puts "Pushing #{repository}...\n"
+      system "git push #{repository} master"
+    end
   end
   
   desc 'Perform a git-tag'
@@ -67,6 +70,9 @@ namespace :git do
   
   desc 'Push all the tags to remote centralized repositories.'
   task :push_tags do
-    repositories.each { |repository| system "git push --tags #{repository}" }
+    repositories.each do |repository|
+      puts "Pushing tags to #{repository}...\n"
+      system "git push --tags #{repository}"
+    end
   end
 end
