@@ -22,10 +22,17 @@ class GitRepositoryTest < Test::Unit::TestCase
     def test_should_create_git_repository
       repository.with_path plugins_path do
         FileUtils.mkdir_p('sashimi')
-        Kernel.expects(:system).with('git clone git://github.com/jodosha/sashimi.git')
+        Kernel.expects(:system).with('git clone git://github.com/jodosha/sashimi.git').returns true
         GitRepository.new(plugin).install
         File.expects(:exists?).with('.git').returns(true)
         assert File.exists?('.git')
+      end
+    end
+
+    def test_should_raise_exception_if_git_was_not_available
+      assert_raise Sashimi::GitNotFound do
+        Kernel.expects(:system).with('git clone git://github.com/jodosha/sashimi.git').returns false
+        GitRepository.new(plugin).install
       end
     end    
   end

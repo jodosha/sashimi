@@ -8,6 +8,20 @@ module Sashimi
       @message || @plugin_name.to_s + " isn't in the local repository."
     end
   end
+
+  class ClientNotFound < StandardError #:nodoc:
+    def initialize(message = nil)
+      @message = message
+    end
+
+    def client
+      self.class.name.demodulize.gsub(/NotFound/, '')
+    end
+
+    def to_s
+      @message || "#{client} wasn't installed or it isn't in your load path."
+    end
+  end
   
   class AbstractRepository
     TEMP_SUFFIX = '-tmp'

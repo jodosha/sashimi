@@ -22,11 +22,18 @@ class SvnRepositoryTest < Test::Unit::TestCase
     def test_should_create_svn_repository
       repository.with_path plugins_path do
         FileUtils.mkdir_p('sashimi')
-        Kernel.expects(:system).with('svn co http://dev.repository.com/svn/sashimi/trunk sashimi')
+        Kernel.expects(:system).with('svn co http://dev.repository.com/svn/sashimi/trunk sashimi').returns true
         SvnRepository.new(create_plugin(nil, 'http://dev.repository.com/svn/sashimi/trunk')).install
         File.expects(:exists?).with('.svn').returns(true)
         assert File.exists?('.svn')
       end
-    end    
+    end
+
+    def test_should_raise_exception_if_svn_was_not_available
+      assert_raise Sashimi::SvnNotFound do
+        Kernel.expects(:system).with('svn co http://dev.repository.com/svn/sashimi/trunk sashimi').returns false
+        SvnRepository.new(create_plugin(nil, 'http://dev.repository.com/svn/sashimi/trunk')).install
+      end
+    end
   end
 end

@@ -1,11 +1,14 @@
 module Sashimi
+  class GitNotFound < ClientNotFound; end #:nodoc:
+
   class GitRepository < AbstractRepository
     # Install the +plugin+.
     def install
       prepare_installation
       puts plugin.guess_name.titleize + "\n\n"
       with_path local_repository_path do
-        Kernel.system("git clone #{plugin.url}")
+        result = Kernel.system("git clone #{plugin.url}")
+        raise GitNotFound unless !!result
         add_to_cache(plugin.to_hash)
       end
     end
@@ -14,7 +17,8 @@ module Sashimi
     def update
       puts plugin.name.titleize + "\n\n"
       with_path plugin_path do
-        Kernel.system('git pull')
+        result = Kernel.system('git pull')
+        raise GitNotFound unless !!result
       end
     end
   end
