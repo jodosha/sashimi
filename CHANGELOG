@@ -1,3 +1,11 @@
+* CHANGELOG massive update
+
+* Use hardcoded file list for sashimi.gemspec
+
+* Give a more informative message when Svn or Git is not installed on the system
+
+* Make sure to load AbstractRepository first. [#15 state:resolved]
+
 * Print on stdout the name of the remote repository while executing Git Rake tasks
 
 * Created Git related Rake tasks
