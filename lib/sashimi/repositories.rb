@@ -1,1 +1,1 @@
-Dir[File.dirname(__FILE__) + '/repositories/*.rb'].each{|f| require f}
+Dir[File.dirname(__FILE__) + '/repositories/*.rb'].sort.each{|f| require f}
