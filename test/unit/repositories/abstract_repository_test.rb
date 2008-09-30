@@ -241,40 +241,46 @@ class AbstractRepositoryTest < Test::Unit::TestCase
     assert_equal cached_plugins, repository.class.cache_content
   end
   
-  def test_should_add_a_new_plugin_to_cache
-    with_clear_cache do
-      with_path local_repository_path do
-        create_plugin_directory('brand_new')
-        plugin = create_plugin(nil, 'git://github.com/jodosha/brand_new.git')
-        repository.add_to_cache(plugin)
-        assert_equal cached_plugins.merge(plugin.to_hash), repository.class.cache_content
+  uses_mocha 'TestAbstractRepositoryCache' do
+    def test_should_add_a_new_plugin_to_cache
+      with_clear_cache do
+        with_path local_repository_path do
+          create_plugin_directory('brand_new')
+          plugin = create_plugin(nil, 'git://github.com/jodosha/brand_new.git')
+          repository.add_to_cache(plugin)
+          assert_equal cached_plugins.merge(plugin.to_hash), repository.class.cache_content
+        end
       end
     end
-  end
-  
-  def test_should_merge_an_existent_plugin_into_cache
-    with_clear_cache do
-      with_path local_repository_path do
-        repository.add_to_cache(plugin)
-        assert_equal cached_plugins.merge(plugin.to_hash), repository.class.cache_content
+
+    def test_should_merge_an_existent_plugin_into_cache
+      File.expects(:atomic_write).with('.plugins', "./")
+      with_clear_cache do
+        with_path local_repository_path do
+          repository.add_to_cache(plugin)
+          assert_equal cached_plugins.merge(plugin.to_hash), repository.class.cache_content
+        end
       end
     end
-  end
-  
-  def test_remove_from_cache
-    with_clear_cache do
-      with_path local_repository_path do
-        repository.remove_from_cache
-        assert_not repository.class.plugins_names.include?(plugin.name)
+
+    def test_remove_from_cache
+      File.expects(:atomic_write).with('.plugins', "./")
+      with_clear_cache do
+        with_path local_repository_path do
+          repository.remove_from_cache
+          assert_not repository.class.plugins_names.include?(plugin.name)
+        end
       end
     end
-  end
-  
-  def test_write_to_cache
-    with_clear_cache do
-      with_path plugins_path do
-        repository.write_to_cache(plugin.to_hash)
-        assert_equal plugin.to_hash, repository.class.cache_content
+
+    def test_write_to_cache
+      File.expects(:atomic_write).with('.plugins', "./")
+      repository.class.expects(:cache_content).returns plugin.to_hash # mock the atomic write result
+      with_clear_cache do
+        with_path plugins_path do
+          repository.write_to_cache(plugin.to_hash)
+          assert_equal plugin.to_hash, repository.class.cache_content
+        end
       end
     end
   end
