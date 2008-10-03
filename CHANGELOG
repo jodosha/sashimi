@@ -1,3 +1,7 @@
+* *v0.2.2*
+
+* Tagged v0.2.2
+
 * Force File#atomic_write to use the current directory as temp path. [#16 state:resolved]
 
 
